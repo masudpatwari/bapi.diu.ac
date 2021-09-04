@@ -1,0 +1,58 @@
+body {
+    font-family: sans-serif;
+    font-size: 14px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+thead {
+    vertical-align: top;
+    text-align: center;
+    font-weight: normal;
+}
+th,
+td {
+    padding: 0.2em;
+    vertical-align: top;
+    border: 0px solid #000;
+}
+
+h3{font-size: 1.2em}
+h4{font-size: 1em}
+h5{font-size: 0.8em}
+h6{font-size: 1em;}
+
+table.header_table,
+table.transcript_table{margin-bottom: 0.5em}
+
+table.header_table tr td{padding: 0;}
+table.award tr th,
+table.award tr td{
+    padding: 0.1em;
+    border: 1px solid #000;
+    font-size: 0.5em;
+    text-align: center;
+}
+table.std_info tr th,
+table.std_info tr td{
+    padding: 0.2em;
+    font-size: 0.8em;
+}
+
+table.transcript_table tr th,
+table.transcript_table tr td{
+    border: 1px solid #000;
+    font-size: 0.6em;
+}
+
+table.footer_table tr th{
+    padding: 0.3em;
+    border: 1px solid #000;
+    font-size: 0.8em;
+}
+table.footer_table tr td{padding: 0.5em 0}
+table.signature_table tr td{
+    font-size: 0.8em;
+}
+@page { margin: 0.2in; }

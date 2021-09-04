@@ -1,0 +1,98 @@
+body {
+    font-family: jamesfajardo;
+    font-size: 16px;
+    line-height: 20px;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
+p{
+	line-height: 24px;
+	text-align:justify;
+}
+@page {
+    margin: 0;
+    padding: 0;
+}
+.clear{
+	width: 100%;
+	overflow: hidden;
+	clear: both;
+	content: "";
+}
+.leftLayOut{
+    float: left;
+    width: 4.70in;
+	height: 100%;
+}
+.rightLayOut{
+    float: right;
+    width: 6.99in;
+    height: 100%;
+}
+.leftLayOut p{
+	width: 3.20in;
+}
+.rightLayOut p{
+	width: 5in;
+	font-size:18px
+}
+
+.imgLayout{
+	height: 1.75in;
+}
+.imgBox{
+	text-align: right;
+}
+
+img{
+	width: 1.40in;
+	height: 1.75in;
+}
+
+.regCodeSession{
+	height: 0.40in;
+}
+.leftRegCode,
+.rightRegCode{
+	float: left;
+	padding-left:0.05in;
+	line-height: 0.40in;
+}
+.leftRegCode{
+	width: 1.80in;
+}
+.rightRegCode{
+	width: 2.40in;
+	font-weight:bold;
+}
+
+.leftSession,
+.rightSession{
+	float: right;
+	padding-left:0.05in;
+	line-height: 0.40in;
+}
+.leftSession{
+	width: 0.90in;
+}
+.rightSession{
+	width: 1.80in;
+}
+
+
+.leftDepartment,
+.rightDepartment{
+	height: 0.40in;
+	padding-left:0.05in;
+	line-height: 0.40in;
+}
+.leftDepartment{
+	width: 3.20in;
+}
+.rightDepartment{
+	width: 5.10in;
+	font-weight:bold;
+}
+
