@@ -1889,16 +1889,16 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         return O_BATCH::whereIn('id', (array)$request->batch_ids)->get();
     }
 
-    public function make_transcript( $student_id )
+    public function make_transcript($student_id)
     {
 
         $distinct_ids = O_MARKS::select('SIFR_ID')->distinct()->where(['STD_ID' => $student_id])->pluck('sifr_id');
 
 
-        $semster_and_ids = O_SEMESTERS::select('ID','SEMESTER')->whereIn('id', $distinct_ids)->pluck('id','semester')->toArray();
+        $semster_and_ids = O_SEMESTERS::select('ID', 'SEMESTER')->whereIn('id', $distinct_ids)->pluck('id', 'semester')->toArray();
 
         // remove duplicate SEMESTER and remove keys
-        $distinct_ids =  array_values( array_unique( $semster_and_ids)) ;
+        $distinct_ids = array_values(array_unique($semster_and_ids));
 
         if (!empty($distinct_ids)) {
 
@@ -1909,18 +1909,18 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
             $gps = O_MARKS::select('gps_id')->where(['std_id' => $student_id])->first();
 
-            if ( ! isset($gps->gps_id) ) throw new \Exception('No Marks Found');
+            if (!isset($gps->gps_id)) throw new \Exception('No Marks Found');
 
-            $grade_point_system_details = O_GRADE_POINT_SYSTEM_DETAIL::grade_point_system_details( $gps->gps_id )->get();
-            $batch_info = O_BATCH::where(['ID' =>$student_info->batch_id, 'DEPARTMENT_ID' => $student_info->department_id])->first();
+            $grade_point_system_details = O_GRADE_POINT_SYSTEM_DETAIL::grade_point_system_details($gps->gps_id)->get();
+            $batch_info = O_BATCH::where(['ID' => $student_info->batch_id, 'DEPARTMENT_ID' => $student_info->department_id])->first();
             $exempted_semester = O_SEMESTERS::where(['department_id' => $student_info->department_id, 'batch_id' => $student_info->batch_id, 'exempted' => 1])->with(['allocatedCourses.course'])->get()->toArray();
             /**
              * when all marksheet approved by exam committee then resultsheet status will be = 4 and resultsheet will be published on provisional
              * status >=4 means pending in  env('DEPT_CHAIRMAN')
              */
-            $semesters = O_SEMESTERS::whereIn('id', $semester_info_table_ids )->where('result_tabulation_status', '>=', env('DEPT_CHAIRMAN'))->with([
+            $semesters = O_SEMESTERS::whereIn('id', $semester_info_table_ids)->where('result_tabulation_status', '>=', env('DEPT_CHAIRMAN'))->with([
                 'allocatedCourses.course',
-                'allocatedCourses.marks' => function($q) use ($student_id){
+                'allocatedCourses.marks' => function ($q) use ($student_id) {
                     $q->where(['std_id' => $student_id])->get();
                 }
             ])->orderBy('semester', 'asc')->get()->toArray();
@@ -1940,20 +1940,22 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
             $transcripts = array_merge($blank_semester, $merge_semester);
 
-            usort($transcripts, function ($a, $b) { return (int)$a['semester'] - (int)$b['semester']; });
+            usort($transcripts, function ($a, $b) {
+                return (int)$a['semester'] - (int)$b['semester'];
+            });
 
             $total_credit_required = array_sum(array_column($transcripts, 'total_credit'));
             $exempted_credit = 0;
             $total_credit_earned = 0;
             $total_cgpa = 0;
-            $semesters_data= [];
+            $semesters_data = [];
             $count = 0;
             $i = 0;
-            $allocated_courses=[];
+            $allocated_courses = [];
             $total_semester_sgpa = 0;
             $has_fail_or_incmplete_in_atleast_one_subject = false;
 
-            foreach ($transcripts as $transcripts_key =>  $transcripts_value) {
+            foreach ($transcripts as $transcripts_key => $transcripts_value) {
                 if ($transcripts_value['exempted'] == 1) {
                     $exempted_credit = $exempted_credit + $transcripts_value['total_credit'];
                 }
@@ -1973,11 +1975,11 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
                         if ($transcripts_value['exempted'] == 0) {
                             if (!empty($allocated_courses_value['marks'])) {
 
-                                if ( $allocated_courses_value['marks'][0]['letter_grade'] == '-'
+                                if ($allocated_courses_value['marks'][0]['letter_grade'] == '-'
                                     || $allocated_courses_value['marks'][0]['letter_grade'] == 'F'
                                     || $allocated_courses_value['marks'][0]['letter_grade'] == null
-                                ){
-                                    if ( $has_fail_or_incmplete_in_atleast_one_subject == false  ){
+                                ) {
+                                    if ($has_fail_or_incmplete_in_atleast_one_subject == false) {
                                         $has_fail_or_incmplete_in_atleast_one_subject = true;
                                     }
                                 }
@@ -1996,7 +1998,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
                                     $total_credit_earned = ($total_credit_earned + $allocated_courses_value['course']['credit']);
                                     $total_semester_gpa = ($total_semester_gpa + ($allocated_courses_value['course']['credit'] * $allocated_courses_value['marks'][0]['grade_point']));
                                 }
-                            }else{
+                            } else {
                                 $allocated_courses[$transcripts_key][$allocated_courses_key]['marks'] = [
                                     'final_total' => '',
                                     'course_total' => '',
@@ -2013,7 +2015,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
                         //$total_semester_sgpa = ($transcripts_value['total_credit'] > 0) ? round(($total_semester_gpa/$transcripts_value['total_credit']), 2) : 0;
                         //$total_cgpa = round(($total_cgpa + round(($transcripts_value['total_credit'] * $total_semester_sgpa), 2)), 2);
 
-                        $total_semester_sgpa = ($transcripts_value['total_credit'] > 0) ? ($total_semester_gpa/$transcripts_value['total_credit']) : 0;
+                        $total_semester_sgpa = ($transcripts_value['total_credit'] > 0) ? ($total_semester_gpa / $transcripts_value['total_credit']) : 0;
                         $total_cgpa = ($total_cgpa + ($transcripts_value['total_credit'] * $total_semester_sgpa));
 
                         foreach ($grade_point_system_details as $gps_key => $semester_gps_value) {
@@ -2025,7 +2027,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
                     }
                 }
 
-                if(!empty($allocated_courses[$transcripts_key])){
+                if (!empty($allocated_courses[$transcripts_key])) {
                     $semesters_data = [
                         'semester' => $transcripts_value['semester'],
                         'exempted' => $transcripts_value['exempted'],
@@ -2034,27 +2036,26 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
                         'total_semester_gpa' => ($transcripts_value['exempted'] == 0) ? $total_semester_sgpa : 'Exempted',
                         'average_grade' => ($transcripts_value['exempted'] == 0) ? $semester_average_grade : 'Exempted',
                         'semester_result' => ($transcripts_value['exempted'] == 0) ? ($semester_average_grade != 'F') ? 'Passed' : '' : 'Exempted',
-                        'allocated_courses' =>  $allocated_courses[$transcripts_key],
+                        'allocated_courses' => $allocated_courses[$transcripts_key],
                     ];
-                }else{
+                } else {
                     $semesters_data = [
                         'semester' => $transcripts_value['semester'],
-                        'allocated_courses' =>  'Semester or Marks not exists',
+                        'allocated_courses' => 'Semester or Marks not exists',
                     ];
                 }
 
-                if( $count % 2  == 1 ){
+                if ($count % 2 == 1) {
                     $transcript_data['semesters'][$i][] = $semesters_data;
                     $i++;
-                    $count =0;
-                }
-                else {
+                    $count = 0;
+                } else {
                     $transcript_data['semesters'][$i][] = $semesters_data;
                     $count++;
                 }
             }
 
-            $total_earned_cgpa = ($total_cgpa > 0 && $total_credit_earned > 0) ? round(($total_cgpa/$total_credit_earned), 2) : 0;
+            $total_earned_cgpa = ($total_cgpa > 0 && $total_credit_earned > 0) ? round(($total_cgpa / $total_credit_earned), 2) : 0;
 
             foreach ($grade_point_system_details as $gps_key => $total_gps_value) {
                 if ($total_gps_value->grade_point <= $total_earned_cgpa) {
@@ -2068,8 +2069,8 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
                 'total_credit_required' => $total_credit_required,
                 'exempted_credit' => $exempted_credit,
                 'total_credit_earned' => $total_credit_earned,
-                'cgpa' => $has_fail_or_incmplete_in_atleast_one_subject?'Incomplete':$total_earned_cgpa,
-                'grade_letter' => $has_fail_or_incmplete_in_atleast_one_subject?'Incomplete':$total_average_grade,
+                'cgpa' => $has_fail_or_incmplete_in_atleast_one_subject ? 'Incomplete' : $total_earned_cgpa,
+                'grade_letter' => $has_fail_or_incmplete_in_atleast_one_subject ? 'Incomplete' : $total_average_grade,
                 'semesters' => $semesters
             ];
             $data['transcript_data'] = $transcript_data;
