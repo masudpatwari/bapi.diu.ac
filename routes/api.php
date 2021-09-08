@@ -94,6 +94,8 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::get('get_banks', [ApiController::class, 'get_banks'])->name('get_banks');
 
+    Route::get('get-bank/{id}', [ApiController::class, 'get_bank'])->name('get_banks');
+
     Route::GET('cashin-report', [ApiController::class, 'cashInReport'])->name('cashInReport');
 
 
@@ -148,6 +150,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::GET('/get-batch-wise-account-info/{batchId}', [ApiController::class, 'batchWiseAccountInfo'])->name('batchWiseAccountInfo');
     Route::GET('/get-batch-wise-account-info-non-covid/{batchId}', [ApiController::class, 'batchWiseAccountInfoNonCovid'])->name('batchWiseAccountInfo');
     Route::GET('/get-purpose-pay', [ApiController::class, 'getPurposePay'])->name('getPurposePay');
+    Route::GET('/get-purpose-pay/{id}', [ApiController::class, 'getPurposePayById'])->name('getPurposePayById');
 
     Route::POST('/general-payment', [ApiController::class, 'save_general_payment'])->name('getPurposePay');
 

@@ -99,6 +99,12 @@ class O_STUDENT extends Eloquent
         return $this->belongsTo(O_CAMPUS::class, 'campus_id', 'id');
     }
 
+
+    public function shift()
+    {
+        return $this->belongsTo(O_SHIFT::class, 'shift_id', 'id');
+    }
+
     public function relCreditTransfer()
     {
         return $this->hasOne(O_CREDIT_TRANSFER::class, 'student_id', 'id');
