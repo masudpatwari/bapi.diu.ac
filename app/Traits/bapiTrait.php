@@ -78,7 +78,7 @@ trait bapiTrait
                 $code = [];
                 foreach ($singleResult['allocated_courses'] as $row) {
 
-                    if ($row['marks']['letter_grade'] == 'F') {
+                    if ($row['marks']['letter_grade'] == 'F' || $row['marks']['letter_grade'] == '') {
                         $code[] = $row['code'];
                     }
 
@@ -86,7 +86,7 @@ trait bapiTrait
 
                 $data['semester_gpa'] = number_format($singleResult['total_semester_gpa'], 2) ?? 'N/A';
                 $data['semester_result'] = $singleResult['semester_result'] ?? 'N/A';
-                $data['incomplete_subject_code'] = implode(',',$code);
+                $data['incomplete_subject_code'] = implode(',', $code);
                 break;
             }
         }

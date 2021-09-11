@@ -46,6 +46,8 @@ class StudentDownloadFormInfoController extends Controller
             $completeSemesters = $studentProvisionalResult['transcript_data']['results']['semesters'];
 
             $totalSemesterSingleArray = array_reduce($totalSemester, 'array_merge', array());
+
+
             $studentSemesters = [];
 
             foreach ($completeSemesters as $completeSemester) {
