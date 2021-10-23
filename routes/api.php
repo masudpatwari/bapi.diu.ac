@@ -10,6 +10,7 @@ use App\Http\Controllers\APIBankController;
 use App\Http\Controllers\Imp_Exam_Schedule;
 use App\Http\Controllers\Imp_Eligible_Courses;
 use App\Http\Controllers\Imp_Invoice_Generator;
+use App\Http\Controllers\Api\StudentReportController;
 use App\Http\Controllers\Api\StudentDownloadFormInfoController;
 
 
@@ -159,8 +160,13 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::get('/{studentId}', StudentDownloadFormInfoController::class);
     });
 
+    Route::prefix('student-report')->group(function () {
+        Route::get('/{regCode}', StudentReportController::class);
+    });
+
 
     Route::get('/test', function (Request $request) {
-        return response()->json(['ip' => $request->ip()], 200);
+//        return \App\Models\O_COURSE::orderBy('ID', 'asc')->where('department_id',7)->get();
+        return \App\Models\O_DEPARTMENTS::get();
     });
 });

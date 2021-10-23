@@ -1611,7 +1611,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         $std_id = $request->std_id;
         $amount = $request->amount;
 
-        $note = "4th covid discount of " . $std_id;
+        $note = "5th covid discount of " . $std_id;
         $office_email = $request->office_email;
 
 
@@ -1623,7 +1623,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         }
         $receive_by = $employee->id;
 
-        $receipt_no = 'covid19-4-' . trim($request->std_id);
+        $receipt_no = 'covid19-5-' . trim($request->std_id);
 
         if (O_CASHIN::where('receipt_no', $receipt_no)->exists()) {
             return response()->json('covid19 SCHOLARSHIP already given', 400);

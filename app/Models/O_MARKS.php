@@ -82,35 +82,36 @@ class O_MARKS extends Eloquent
     /**
      * Called **** credit_transfer_marksheet@create
      */
-    public static function check_mark_exists_of_a_course_of_a_student(int     $semester_info_table_id, int $course_id, int $student_id)
+    public static function check_mark_exists_of_a_course_of_a_student(int $semester_info_table_id, int $course_id, int $student_id)
     {
-        return static::where(['COURSE_ID' => $course_id, 'SIFR_ID' => $semester_info_table_id, 'STD_ID'=>$student_id])->get();
+        return static::where(['COURSE_ID' => $course_id, 'SIFR_ID' => $semester_info_table_id, 'STD_ID' => $student_id])->get();
     }
 
     /*
      * This function will calculate total cgpa present and past semester only passed course.
      * Failed course credit will be deducked from total credit.
      */
-    public static function tabulation_cgpa( $student_id, $semester_no ){
-	   $db_prefix = env('O_SCHEMA_PREFIX');
+    public static function tabulation_cgpa($student_id, $semester_no)
+    {
+        $db_prefix = env('O_SCHEMA_PREFIX');
         $result = DB::connection('oracle')->select('
             SELECT (
-                SELECT SUM(GRADE_POINT * '.$db_prefix.'.COURSE.CREDIT) FROM '.$db_prefix.'.MARKS JOIN '.$db_prefix.'.COURSE ON '.$db_prefix.'.COURSE.ID = COURSE_ID WHERE STD_ID = '.$student_id.' AND COURSE_ID IN (
-                    SELECT COURSE_ID FROM '.$db_prefix.'.COURSE_ALLOCATION_INFO WHERE SIFR_ID IN (
-                        SELECT ID FROM '.$db_prefix.'.SEMESTER_INFO_FOR_RESULT WHERE ID IN (
-                            SELECT DISTINCT SIFR_ID FROM '.$db_prefix.'.MARKS WHERE STD_ID = '.$student_id.'
-                        ) AND SEMESTER <= '.$semester_no.'
-                    ) 
+                SELECT SUM(GRADE_POINT * ' . $db_prefix . '.COURSE.CREDIT) FROM ' . $db_prefix . '.MARKS JOIN ' . $db_prefix . '.COURSE ON ' . $db_prefix . '.COURSE.ID = COURSE_ID WHERE STD_ID = ' . $student_id . ' AND COURSE_ID IN (
+                    SELECT COURSE_ID FROM ' . $db_prefix . '.COURSE_ALLOCATION_INFO WHERE SIFR_ID IN (
+                        SELECT ID FROM ' . $db_prefix . '.SEMESTER_INFO_FOR_RESULT WHERE ID IN (
+                            SELECT DISTINCT SIFR_ID FROM ' . $db_prefix . '.MARKS WHERE STD_ID = ' . $student_id . '
+                        ) AND SEMESTER <= ' . $semester_no . '
+                    )
                 ) AND to_number(GRADE_POINT) > 0
-            ) 
-            / 
+            )
+            /
             (
-            SELECT SUM(CREDIT) FROM '.$db_prefix.'.COURSE WHERE ID IN (
-                SELECT COURSE_ID FROM '.$db_prefix.'.MARKS WHERE STD_ID = '.$student_id.' AND COURSE_ID IN (
-                    SELECT COURSE_ID FROM '.$db_prefix.'.COURSE_ALLOCATION_INFO WHERE SIFR_ID IN (
-                        SELECT ID FROM '.$db_prefix.'.SEMESTER_INFO_FOR_RESULT WHERE ID IN (
-                            SELECT DISTINCT SIFR_ID  FROM '.$db_prefix.'.MARKS WHERE STD_ID = '.$student_id.'
-                        ) AND SEMESTER <= '.$semester_no.'
+            SELECT SUM(CREDIT) FROM ' . $db_prefix . '.COURSE WHERE ID IN (
+                SELECT COURSE_ID FROM ' . $db_prefix . '.MARKS WHERE STD_ID = ' . $student_id . ' AND COURSE_ID IN (
+                    SELECT COURSE_ID FROM ' . $db_prefix . '.COURSE_ALLOCATION_INFO WHERE SIFR_ID IN (
+                        SELECT ID FROM ' . $db_prefix . '.SEMESTER_INFO_FOR_RESULT WHERE ID IN (
+                            SELECT DISTINCT SIFR_ID  FROM ' . $db_prefix . '.MARKS WHERE STD_ID = ' . $student_id . '
+                        ) AND SEMESTER <= ' . $semester_no . '
                     )
                 ) AND to_number(grade_point) > 0
             )
@@ -118,11 +119,13 @@ class O_MARKS extends Eloquent
         )[0]->result;
         return round($result, 2);
     }
-    public static function hasFailed( $student_id ){
-	   $db_prefix = env('O_SCHEMA_PREFIX');
-        $result = DB::connection('oracle')->select("SELECT  LETTER_GRADE FROM " . $db_prefix.".MARKS WHERE STD_ID = " .$student_id ." AND (LETTER_GRADE IS NULL OR LETTER_GRADE = 'F')");
 
-        return count($result)>0?true:false;
+    public static function hasFailed($student_id)
+    {
+        $db_prefix = env('O_SCHEMA_PREFIX');
+        $result = DB::connection('oracle')->select("SELECT  LETTER_GRADE FROM " . $db_prefix . ".MARKS WHERE STD_ID = " . $student_id . " AND (LETTER_GRADE IS NULL OR LETTER_GRADE = 'F')");
+
+        return count($result) > 0 ? true : false;
 
     }
 
@@ -138,7 +141,7 @@ class O_MARKS extends Eloquent
 
     public function student()
     {
-        return $this->belongsTo(O_STUDENT::class,'std_id', 'id');
+        return $this->belongsTo(O_STUDENT::class, 'std_id', 'id');
     }
 
     public function courseAllocation()
@@ -148,18 +151,23 @@ class O_MARKS extends Eloquent
 
     public function course()
     {
-        return $this->belongsTo(O_COURSE::class,'course_id', 'id');
+        return $this->belongsTo(O_COURSE::class, 'course_id', 'id');
     }
 
 
     public function entryBy()
     {
-        return $this->belongsTo(M_WP_EMP::class,'creator_id', 'id');
+        return $this->belongsTo(M_WP_EMP::class, 'creator_id', 'id');
     }
 
     public function marksHistory()
     {
-        return $this->hasMany(O_MARKS_EDIT_HISTORY::class,'marks_id', 'id');
+        return $this->hasMany(O_MARKS_EDIT_HISTORY::class, 'marks_id', 'id');
+    }
+
+    public function getGradePointAttribute($value)
+    {
+        return number_format($value, 2);
     }
 
 }

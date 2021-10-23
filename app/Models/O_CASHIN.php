@@ -45,7 +45,7 @@ class O_CASHIN extends Eloquent
             ->with('purposePay')
             ->get();
 
-        $student = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER")->where(['id' => $ora_uid ])->first();
+        $student = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER, payment_from_semester")->where(['id' => $ora_uid ])->first();
 
         $batchObj = O_BATCH::with('paymemtSystem')->find( $student->batch_id );
 
@@ -70,11 +70,20 @@ class O_CASHIN extends Eloquent
         $sumOfScholarship= (int) $cashinCollection->where('purpose_pay_id', O_PURPOSE_PAY::SCHOLARSHIP_STATUS_ID)->sum('amount');
 
         // step: 5
-        $perSemesterScholarship = $numberOfSemestInStudentTable == 0? 0 : ( ($sumOfScholarship + $admissionFee) / $numberOfSemestInStudentTable);
+
+        if ( strpos($student->reg_code,'-CT') > 0 ){ // is Credit Transfer Student?
+            $semester =  ( $numberOfSemestInStudentTable - $student->payment_from_semester )==0
+                ? $numberOfSemestInStudentTable
+                :( $numberOfSemestInStudentTable - $student->payment_from_semester);
+            $perSemesterScholarship = $numberOfSemestInStudentTable == 0? 0 : ( ($sumOfScholarship + $admissionFee) / $semester);
+        }else{
+            $perSemesterScholarship = $numberOfSemestInStudentTable == 0? 0 : ( ($sumOfScholarship + $admissionFee) / $numberOfSemestInStudentTable);
+        }
+
 
         // step: 6
         $sumOfTutionsFee=   (int) $cashinCollection->where('purpose_pay_id', O_PURPOSE_PAY::TUITION_FEE_STATUS_ID)->sum('amount');
-        
+
 	    $sumOfWaiverFee=   (int) $cashinCollection->where('purpose_pay_id', O_PURPOSE_PAY::WAIVER_ID)->sum('amount');
 
 	    $advEngFee=   (int) $cashinCollection->where('purpose_pay_id', 23)->sum('amount'); // adv eng fee
@@ -84,7 +93,9 @@ class O_CASHIN extends Eloquent
         // step: 7
         $parent_batch_id  = (int) $batchObj->parent_batch_id ;
         if ( $parent_batch_id > 0){
-            $semesterCompleted = O_SEMESTERS::where('batch_id', $batchObj->id)->orWhere('batch_id', $batchObj->parent_batch_id )->where('exempted',0)->count();
+            $semesterCompleted = O_SEMESTERS::where('batch_id', $batchObj->id)
+                ->orWhere('batch_id', $batchObj->parent_batch_id )
+                ->where('exempted',0)->count();
         }
         else{
             $semesterCompleted = O_SEMESTERS::where('batch_id', $batchObj->id)->where('exempted',0)->count();
@@ -94,8 +105,7 @@ class O_CASHIN extends Eloquent
         $semesterNeedToComplete = ( $semesterCompleted) - $noOfEximptedSemester;
 
         // step: 8
-        $currentPayable = ($persemsterFeeWithoutScholarship * $semesterCompleted ) - ($perSemesterScholarship * $semesterCompleted );
-
+        $currentPayable = ($persemsterFeeWithoutScholarship * ($semesterCompleted ) ) - ($perSemesterScholarship * $semesterCompleted );
 
         // step: 10
         $totalDues = $actualFee  - $sumOfScholarship - $totalPaid;
@@ -105,9 +115,10 @@ class O_CASHIN extends Eloquent
         if ( strpos($student->reg_code,'-CT') > 0 ){ // is Credit Transfer Student?
             $perSemesterFee = $actualFee / (
                     ( $numberOfSemestInStudentTable - $student->payment_from_semester )==0
-                    ?1
+                    ? $numberOfSemestInStudentTable
                     :( $numberOfSemestInStudentTable - $student->payment_from_semester)
                 );
+            $perSemesterFee = $perSemesterFee - $perSemesterScholarship;
         }else{
             $perSemesterFee = $persemsterFeeWithoutScholarship - $perSemesterScholarship;
         }
@@ -119,7 +130,7 @@ class O_CASHIN extends Eloquent
 
          if( $totalDues < $currentDues){
                 $currentDues = $totalDues;
-        }	
+        }
 
         return [
             'summary' => [
@@ -222,7 +233,7 @@ class O_CASHIN extends Eloquent
 
 	 if( $totalDues < $currentDues){
                 $currentDues = $totalDues;
-        }	
+        }
 
 	$preSemesterDue = $currentDues - ceil($perSemesterFee);
 

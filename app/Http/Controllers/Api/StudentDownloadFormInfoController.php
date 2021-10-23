@@ -32,7 +32,7 @@ class StudentDownloadFormInfoController extends Controller
     {
 
         $student = O_STUDENT::with('department:id,name', 'batch:id,batch_name', 'employee:id,emp_name','shift')
-            ->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO,  ADM_FRM_SL ,  ADM_DATE ,emp_id,SESSION_NAME,EMAIL,PHONE_NO")
+            ->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO,  ADM_FRM_SL ,  ADM_DATE ,emp_id,SESSION_NAME,EMAIL,PHONE_NO,F_NAME,M_NAME,GENDER")
             ->where('VERIFIED', 1)
             ->where(['ID' => $studentId]);
 
@@ -43,7 +43,10 @@ class StudentDownloadFormInfoController extends Controller
 
             $totalSemester = $studentProvisionalResult['transcript_data']['semesters'];
 
+
             $completeSemesters = $studentProvisionalResult['transcript_data']['results']['semesters'];
+
+
 
             $totalSemesterSingleArray = array_reduce($totalSemester, 'array_merge', array());
 
@@ -60,6 +63,7 @@ class StudentDownloadFormInfoController extends Controller
                     'semester_result' => $semester_result['semester_result'] ?? 'N/A',
                     'created_by' => $completeSemester['created_by_user']['NAME'] ?? 'N/A',
                     'incomplete_subject_code' => $semester_result['incomplete_subject_code'] ?? 'N/A',
+                    'status' => $completeSemester['result_tabulation_status'],
                 ];
             }
 
@@ -76,13 +80,17 @@ class StudentDownloadFormInfoController extends Controller
 
             $cashin_data = O_CASHIN::get_student_account_info_summary($std->id);
 
+//            return $cashin_data;
+
             $std->actual_total_fee = $cashin_data['summary']['actual_total_fee'] ?? 'N/A';
             $std->total_paid = $cashin_data['summary']['total_paid'] ?? 'N/A';
             $std->total_due = $cashin_data['summary']['total_due'] ?? 'N/A';
+            $std->special_scholarship = $cashin_data['summary']['special_scholarship'] ?? 'N/A';
             $std->studentSemesters = $studentSemesters;
             $std->grade_letter = $studentProvisionalResult['transcript_data']['results']['grade_letter'] ?? 'N/A';
             $std->cgpa = $studentProvisionalResult['transcript_data']['results']['cgpa'] ?? 'N/A';
             $std->incomplete_sub_code = collect($incomplete_subject_codes)->implode('incomplete_subject_code', ',');
+            $std->current_semester = $std->getMaxAsCurrentSemester();
 
             $data = [
                 'student' => $std,

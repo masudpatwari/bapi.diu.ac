@@ -87,7 +87,7 @@ class Controller extends BaseController
             // $semester_info_table_ids = array_column($distinct_ids, 'sifr_id');
             $semester_info_table_ids = $distinct_ids;
 
-            $student_info = O_STUDENT::where('id', $student_id)->first();
+            $student_info = O_STUDENT::with('department','batch:id,batch_name')->where('id', $student_id)->first();
 
             $gps = O_MARKS::select('gps_id')->where(['std_id' => $student_id])->first();
 
@@ -153,6 +153,7 @@ class Controller extends BaseController
                 if (!empty($transcripts_value['allocated_courses'])) {
                     foreach ($transcripts_value['allocated_courses'] as $allocated_courses_key => $allocated_courses_value) {
                         $allocated_courses[$transcripts_key][$allocated_courses_key] = [
+                           'id' => $allocated_courses_value['course']['id'],
                             'name' => $allocated_courses_value['course']['name'],
                             'code' => $allocated_courses_value['course']['code'],
                             'credit' => $allocated_courses_value['course']['credit'],
