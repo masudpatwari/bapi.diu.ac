@@ -11,6 +11,8 @@ use App\Http\Controllers\Imp_Exam_Schedule;
 use App\Http\Controllers\Imp_Eligible_Courses;
 use App\Http\Controllers\Imp_Invoice_Generator;
 use App\Http\Controllers\Api\StudentReportController;
+use App\Http\Controllers\Api\BatchWiseStudentsController;
+use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
 use App\Http\Controllers\Api\StudentDownloadFormInfoController;
 
 
@@ -164,6 +166,10 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::get('/{regCode}', StudentReportController::class);
     });
 
+    Route::prefix('admission')->group(function () {
+        Route::get('active-batch-for-admission', ActiveBatchForAdmissionController::class);
+        Route::get('batch-wise-students/{batch_id}', BatchWiseStudentsController::class);
+    });
 
     Route::get('/test', function (Request $request) {
 //        return \App\Models\O_COURSE::orderBy('ID', 'asc')->where('department_id',7)->get();
