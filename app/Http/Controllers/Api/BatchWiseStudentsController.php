@@ -16,7 +16,7 @@ class BatchWiseStudentsController extends Controller
      */
     public function __invoke(Request $request, $batch_id)
     {
-        $students = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER, payment_from_semester")
+        $students = O_STUDENT::selectRaw("ID,NAME,ROLL_NO,REG_CODE,PHONE_NO,ADM_FRM_SL")
             ->where('BATCH_ID', $batch_id)
             ->get();
         return $students;

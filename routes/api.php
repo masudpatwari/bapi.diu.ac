@@ -10,10 +10,15 @@ use App\Http\Controllers\APIBankController;
 use App\Http\Controllers\Imp_Exam_Schedule;
 use App\Http\Controllers\Imp_Eligible_Courses;
 use App\Http\Controllers\Imp_Invoice_Generator;
+use App\Http\Controllers\Api\GroupIndexController;
+use App\Http\Controllers\Api\ShiftIndexController;
+use App\Http\Controllers\Api\CountryIndexController;
 use App\Http\Controllers\Api\StudentReportController;
 use App\Http\Controllers\Api\BatchWiseStudentsController;
+use App\Http\Controllers\Api\RefereedByParentIndexController;
 use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
 use App\Http\Controllers\Api\StudentDownloadFormInfoController;
+use App\Http\Controllers\Api\RefereedChildByParentIndexController;
 
 
 /*
@@ -169,7 +174,14 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::prefix('admission')->group(function () {
         Route::get('active-batch-for-admission', ActiveBatchForAdmissionController::class);
         Route::get('batch-wise-students/{batch_id}', BatchWiseStudentsController::class);
+        Route::get('refereed-by-parent/index', RefereedByParentIndexController::class);
+        Route::get('refereed-child-by-parent/{parent_id}', RefereedChildByParentIndexController::class);
     });
+
+    Route::get('shifts', ShiftIndexController::class);
+    Route::get('groups', GroupIndexController::class);
+    Route::get('country', CountryIndexController::class);
+
 
     Route::get('/test', function (Request $request) {
 //        return \App\Models\O_COURSE::orderBy('ID', 'asc')->where('department_id',7)->get();
