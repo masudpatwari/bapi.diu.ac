@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\StudentReportController;
 use App\Http\Controllers\Api\BatchWiseStudentsController;
 use App\Http\Controllers\Api\RefereedByParentIndexController;
 use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
+use App\Http\Controllers\Api\ActiveBatchStudentStoreController;
 use App\Http\Controllers\Api\StudentDownloadFormInfoController;
 use App\Http\Controllers\Api\RefereedChildByParentIndexController;
 
@@ -176,6 +177,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::get('batch-wise-students/{batch_id}', BatchWiseStudentsController::class);
         Route::get('refereed-by-parent/index', RefereedByParentIndexController::class);
         Route::get('refereed-child-by-parent/{parent_id}', RefereedChildByParentIndexController::class);
+        Route::post('active-batch-student-store', ActiveBatchStudentStoreController::class);
     });
 
     Route::get('shifts', ShiftIndexController::class);
