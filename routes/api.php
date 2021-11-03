@@ -12,9 +12,12 @@ use App\Http\Controllers\Imp_Eligible_Courses;
 use App\Http\Controllers\Imp_Invoice_Generator;
 use App\Http\Controllers\Api\GroupIndexController;
 use App\Http\Controllers\Api\ShiftIndexController;
+use App\Http\Controllers\Api\BatchStoreController;
+use App\Http\Controllers\Api\CampussIndexController;
 use App\Http\Controllers\Api\CountryIndexController;
 use App\Http\Controllers\Api\StudentReportController;
 use App\Http\Controllers\Api\BatchWiseStudentsController;
+use App\Http\Controllers\Api\PaymentSystemIndexController;
 use App\Http\Controllers\Api\RefereedByParentIndexController;
 use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
 use App\Http\Controllers\Api\ActiveBatchStudentStoreController;
@@ -178,11 +181,14 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::get('refereed-by-parent/index', RefereedByParentIndexController::class);
         Route::get('refereed-child-by-parent/{parent_id}', RefereedChildByParentIndexController::class);
         Route::post('active-batch-student-store', ActiveBatchStudentStoreController::class);
+        Route::post('batch-store', BatchStoreController::class);
     });
 
     Route::get('shifts', ShiftIndexController::class);
     Route::get('groups', GroupIndexController::class);
     Route::get('country', CountryIndexController::class);
+    Route::get('campuss', CampussIndexController::class);
+    Route::get('payment-system', PaymentSystemIndexController::class);
 
 
     Route::get('/test', function (Request $request) {

@@ -103,7 +103,7 @@ class ActiveBatchStudentStoreController extends Controller
             ->first();
 
         $student = new O_STUDENT();
-        $student->NAME = $request->student_name;
+        $student->NAME = trim($request->student_name);
         $student->ROLL_NO = '0';
         $student->REG_CODE = '0';
         $student->DEPARTMENT_ID = $request->department_id;
@@ -114,7 +114,7 @@ class ActiveBatchStudentStoreController extends Controller
         $student->BLOOD_GROUP = $request->blood_group;
         $student->EMAIL = $request->email;
         $student->PHONE_NO = trim($request->phone_no);
-        $student->ADM_FRM_SL = $request->adm_frm_sl;
+        $student->ADM_FRM_SL = trim($request->adm_frm_sl);
         $student->RELIGION_ID = $request->religion_id;
         $student->GENDER = $request->gender;
         $student->DOB = date('Y-m-d', strtotime($request->dob));
