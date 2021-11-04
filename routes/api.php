@@ -23,6 +23,8 @@ use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
 use App\Http\Controllers\Api\ActiveBatchStudentStoreController;
 use App\Http\Controllers\Api\StudentDownloadFormInfoController;
 use App\Http\Controllers\Api\RefereedChildByParentIndexController;
+use App\Http\Controllers\Api\BatchWiseUnVerifiedStudentsController;
+use App\Http\Controllers\Api\AdmissionStudentRegCodeGenerateController;
 
 
 /*
@@ -178,10 +180,12 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::prefix('admission')->group(function () {
         Route::get('active-batch-for-admission', ActiveBatchForAdmissionController::class);
         Route::get('batch-wise-students/{batch_id}', BatchWiseStudentsController::class);
+        Route::get('batch-wise-unverified-students/{batch_id}', BatchWiseUnVerifiedStudentsController::class);
         Route::get('refereed-by-parent/index', RefereedByParentIndexController::class);
         Route::get('refereed-child-by-parent/{parent_id}', RefereedChildByParentIndexController::class);
         Route::post('active-batch-student-store', ActiveBatchStudentStoreController::class);
         Route::post('batch-store', BatchStoreController::class);
+        Route::post('unverified-student-reg-code-generate', AdmissionStudentRegCodeGenerateController::class);
     });
 
     Route::get('shifts', ShiftIndexController::class);

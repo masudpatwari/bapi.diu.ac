@@ -66,6 +66,11 @@ class O_BATCH extends Eloquent
         return $this->hasMany(O_STUDENT::class, 'batch_id')->where('VERIFIED', 1);
     }
 
+    public function unVerifiedStudents()
+    {
+        return $this->hasMany(O_STUDENT::class, 'batch_id')->where('VERIFIED', 0);
+    }
+
     public function newEloquentBuilder($query): OBatchBuilder
     {
         return new OBatchBuilder($query);

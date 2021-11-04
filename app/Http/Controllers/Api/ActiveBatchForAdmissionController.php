@@ -20,15 +20,14 @@ class ActiveBatchForAdmissionController extends Controller
     public function __invoke(Request $request)
     {
         $batch = O_BATCH::with('relDepartment', 'campus', 'relShift', 'group','paymemtSystem')
-            ->withCount('activeStudents')
+            ->withCount('activeStudents','unVerifiedStudents')
             ->active()
-//            ->notNullLastDateOfAdm()
-//            ->lastDateOfAdmExpired()
             ->orderAscending()
             ->get();
 
         $collection = collect($batch);
         $sorted = $collection->sortBy('active_students_count');
+
         return ActiveBatchForAdmissionResource::collection($sorted->values()->all());
     }
 }
