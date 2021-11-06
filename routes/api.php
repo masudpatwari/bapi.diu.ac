@@ -195,6 +195,9 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::get('payment-system', PaymentSystemIndexController::class);
 
 
+    Route::get('receipt-no-check/{receipt_no}', [ApiController::class, 'receiptNoCheck'])->name('receiptNoCheck');
+
+
     Route::get('/test', function (Request $request) {
 //        return \App\Models\O_COURSE::orderBy('ID', 'asc')->where('department_id',7)->get();
         return \App\Models\O_DEPARTMENTS::get();

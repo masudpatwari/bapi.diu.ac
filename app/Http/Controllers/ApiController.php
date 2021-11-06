@@ -1910,4 +1910,13 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 //	var_dump($request->batch_ids);
         return O_BATCH::whereIn('id', (array)$request->batch_ids)->get();
     }
+
+    public function receiptNoCheck($receipt_no)
+    {
+        if (O_CASHIN::where('receipt_no', trim($receipt_no))->exists()) {
+            return response()->json(['status' => true], 200);
+        }
+
+        return response()->json(['status' => false], 200);
+    }
 }

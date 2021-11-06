@@ -71,7 +71,7 @@ class BatchStoreController extends Controller
         $batch->BATCH_NAME  = $request->batch_name;
         $batch->PAYMENT_SYSTEM_ID  = $request->payment_system;
         $batch->ADMISSION_START_DATE  = date('Y/m/d', strtotime($request->admission_start_date));
-        $batch->YEAR  = $request->year;
+        $batch->ADM_YEAR  = $request->year;
         $batch->ADM_SEASON  = $request->admission_season;
         $batch->save();
 

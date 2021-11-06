@@ -26,6 +26,7 @@ class ActiveBatchStudentStoreController extends Controller
             'shift_id' => 'required|integer',
             'group_id' => 'required|integer',
             'adm_frm_sl' => 'required|max:20',
+            'admission_season' => 'required|integer',
             'student_name' => 'required|string|max:80',
             'blood_group' => 'required|max:4',
             'email' => 'nullable|email',
@@ -115,6 +116,7 @@ class ActiveBatchStudentStoreController extends Controller
         $student->EMAIL = $request->email;
         $student->PHONE_NO = trim($request->phone_no);
         $student->ADM_FRM_SL = trim($request->adm_frm_sl);
+        $student->ADM_SEASON = trim($request->admission_season);
         $student->RELIGION_ID = $request->religion_id;
         $student->GENDER = $request->gender;
         $student->DOB = date('Y-m-d', strtotime($request->dob));
@@ -140,6 +142,7 @@ class ActiveBatchStudentStoreController extends Controller
         $student->MARITAL_STATUS = $request->marital_status;
         $student->VERIFIED = 0;
         $student->ADM_DATE = date('Y-m-d');
+        $student->YEAR = $batch->adm_year;
         $student->CAMPUS_ID = $batch->campus_id;
         $student->STD_BIRTH_OR_NID_NO = $request->std_birth_or_nid_no;
         $student->FATHER_NID_NO = $request->father_nid_no;

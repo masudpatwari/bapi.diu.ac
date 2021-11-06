@@ -27,7 +27,7 @@ class ActiveBatchForAdmissionResource extends JsonResource
             'duration_of_sem_m' => $this->duration_of_sem_m,
             'no_seat' => $this->no_seat,
             'sess' => $this->sess,
-            'year' => $this->year ?? 'N/A',
+            'year' => $this->adm_year ?? 'N/A',
             'adm_season' => $this->adm_season ?? 'N/A',
             'valid_d_idcard' => $this->valid_d_idcard ? Carbon::parse($this->valid_d_idcard)->format('d M, Y') : '-',
             'active_status' => $this->active_status,
