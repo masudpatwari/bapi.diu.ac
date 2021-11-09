@@ -545,6 +545,7 @@ class ApiController extends Controller
                 'campus_id' => $student->campus_id,
                 'session' => $student->batch->sess,
                 'shift_id' => $student->shift_id,
+                'email' => $student->email ?? 'N/A',
             ];
         }
         return response()->json(['error' => 'No Student Found!'], 400);

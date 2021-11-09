@@ -18,6 +18,10 @@ use App\Http\Controllers\Api\CountryIndexController;
 use App\Http\Controllers\Api\StudentReportController;
 use App\Http\Controllers\Api\BatchWiseStudentsController;
 use App\Http\Controllers\Api\PaymentSystemIndexController;
+use App\Http\Controllers\Api\StudentSessionEditController;
+use App\Http\Controllers\Api\StudentSessionUpdateController;
+use App\Http\Controllers\Api\StudentSessionStoreController;
+use App\Http\Controllers\Api\StudentSessionIndexController;
 use App\Http\Controllers\Api\RefereedByParentIndexController;
 use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
 use App\Http\Controllers\Api\ActiveBatchStudentStoreController;
@@ -186,6 +190,10 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::post('active-batch-student-store', ActiveBatchStudentStoreController::class);
         Route::post('batch-store', BatchStoreController::class);
         Route::post('unverified-student-reg-code-generate', AdmissionStudentRegCodeGenerateController::class);
+        Route::get('student-session', StudentSessionIndexController::class);
+        Route::post('student-session', StudentSessionStoreController::class);
+        Route::get('student-session/{id}/edit', StudentSessionEditController::class);
+        Route::post('student-session-update', StudentSessionUpdateController::class);
     });
 
     Route::get('shifts', ShiftIndexController::class);
