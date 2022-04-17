@@ -235,8 +235,12 @@ class ApiController extends Controller
 
             $currentSemester = $std->getMaxAsCurrentSemester();
 
+            // return $currentSemester;
+
             if (!empty($std)) {
                 $transcript = $this->make_transcript($student_id);
+
+                // return $transcript;
                 if (!empty($transcript)) {
                     unset($transcript['student_info']->image);
                     unset($transcript['student_info']->password);
@@ -423,6 +427,59 @@ class ApiController extends Controller
         return O_VIEW_S_BATCH::all();
     }
 
+    public function batches_in_department($department)
+    {
+        return O_BATCH::where('department_id', $department)->get();
+    }
+
+    public function get_active_batch()
+    {
+        $data['batches'] = O_BATCH::where('active_status', 1)->get();
+
+        $data['departments'] = $data['batches']->pluck('department_id')->unique()->values();
+
+        return $data;
+    }
+
+
+    public function get_active_courses(Request $request)
+    {
+        return O_COURSE::get();
+        // return O_COURSE::whereIn('department_id', $request->all())
+        //->get();
+    }
+
+
+
+    public function get_program_officer_nos()
+    {
+
+        return $semisters = O_SEMESTERS::with('programOfficer:mno1,mno2,id')
+            // whereIn('batch_id',$ids)
+            // ->where(['batch_id'=>$request->batch_id,'semester'=>$request->semester])
+            ->select(['department_id','batch_id','semester','program_officer_id'])
+            ->get();
+
+        // return $semesters->whereIn('batch_id', [800,805,821,830,798,854,768,807,841,842,843,755,832,840,777,790,799,810,835,844,850,758,803,849,858]);
+    }
+
+    public function get_program_officer_by_semester_batch($batch, $semester)
+    {
+        $semisters = O_SEMESTERS::with('programOfficer:mno1,id')
+             ->where('batch_id',$batch)
+             ->where('semester',$semester)
+             ->get();
+
+
+        return $semisters->pluck('programOfficer');
+    }
+
+
+    public function get_students()
+    {
+        return O_STUDENT::select('id', 'name','batch_id', 'phone_no', 'f_cellno', 'g_cellno')->where('verified', 1)->get();
+    }
+
     public function get_single_batch_detail($batch_id)
     {
         return O_VIEW_S_BATCH::where(['id' => $batch_id])->first();
@@ -515,7 +572,8 @@ class ApiController extends Controller
             return response()->json(['message' => $e->getMessage()], 401);
         }*/
 
-        $students = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ")
+        $students = O_STUDENT::with('group')
+            ->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,GROUP_ID,EMAIL,PHONE_NO,F_NAME,E_NAME,E_CELLNO")
             ->where('VERIFIED', 1)
             ->where(['batch_id' => $batch_id])
             ->orderBy('roll_no');
@@ -527,9 +585,23 @@ class ApiController extends Controller
         return response()->json(['error' => 'No Student Found!'], 400);
     }
 
+    public function get_students_by_batch(int $batch_id)
+    {
+
+        $students = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  BATCH_ID , PHONE_NO, F_CELLNO, G_CELLNO")
+            ->where('VERIFIED', 1)
+            ->where(['batch_id' => $batch_id])
+            ->orderBy('roll_no');
+
+        if ($students->count() > 0) {
+            return response()->json($students->get(), 200);
+        }
+        return response()->json(['error' => 'No Student Found!'], 400);
+    }
+
     public function get_student_by_reg_code($reg_code)
     {
-        $student = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO ,  GROUP_ID ,  BLOOD_GROUP ,  EMAIL ,  PHONE_NO ,  ADM_FRM_SL ,  RELIGION_ID ,  GENDER ,  DOB ,  BIRTH_PLACE ,  FG_MONTHLY_INCOME ,  PARMANENT_ADD ,  MAILING_ADD ,  F_NAME ,  F_CELLNO ,  F_OCCU ,  M_NAME ,  M_CELLNO ,  M_OCCU ,  G_NAME ,  G_CELLNO ,  G_OCCU ,  E_NAME ,  E_CELLNO ,  E_OCCU ,  E_ADDRESS ,  E_RELATION ,  EMP_ID ,  NATIONALITY ,  MARITAL_STATUS ,  ADM_DATE ,  CAMPUS_ID ,  STD_BIRTH_OR_NID_NO ,  FATHER_NID_NO ,  MOTHER_NID_NO")->with('department', 'batch')->where(['REG_CODE' => $reg_code])->first();
+        $student = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO ,  GROUP_ID ,  BLOOD_GROUP ,  EMAIL ,  PHONE_NO ,  ADM_FRM_SL ,  RELIGION_ID ,  GENDER ,  DOB ,  BIRTH_PLACE ,  FG_MONTHLY_INCOME ,  PARMANENT_ADD ,  MAILING_ADD ,  F_NAME ,  F_CELLNO ,  F_OCCU ,  M_NAME ,  M_CELLNO ,  M_OCCU ,  G_NAME ,  G_CELLNO ,  G_OCCU ,  E_NAME ,  E_CELLNO ,  E_OCCU ,  E_ADDRESS ,  E_RELATION ,  EMP_ID ,  NATIONALITY ,  MARITAL_STATUS ,  ADM_DATE ,  CAMPUS_ID ,  STD_BIRTH_OR_NID_NO ,  FATHER_NID_NO ,  MOTHER_NID_NO")->with('department', 'batch','relCampus')->where(['REG_CODE' => $reg_code])->first();
 
         if ($student) {
             return [
@@ -540,12 +612,16 @@ class ApiController extends Controller
                 'reg_code' => $student->reg_code,
                 'father_name' => $student->f_name ?? 'No Father Name',
                 'mother_name' => $student->m_name ?? 'No Mother Name',
+                'department_id' => $student->department_id,
                 'department' => $student->department->name,
+                'batch_id' => $student->batch_id,
+                'group_id' => $student->group_id,
                 'batch' => $student->batch->batch_name,
                 'campus_id' => $student->campus_id,
                 'session' => $student->batch->sess,
                 'shift_id' => $student->shift_id,
                 'email' => $student->email ?? 'N/A',
+                'campus_name' => $student->relCampus->name ?? 'N/A',
             ];
         }
         return response()->json(['error' => 'No Student Found!'], 400);
@@ -1092,7 +1168,8 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
     public function get_banks()
     {
-        $banks = O_BANK::orderBy('name', 'asc')->get();
+       $banks = O_BANK::orderBy('name', 'asc')->get();
+        // $banks = O_BANK::orderBy('name', 'asc')->find([1,3,4,5]);
         if ($banks->count() == 0) {
             return response()->json(['message' => 'No banks found'], 400);
         }
@@ -1282,6 +1359,18 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         return NULL;
     }
 
+    public function attendance_batch_students($batch_id)
+    {
+
+        $students = O_STUDENT::select('ID', 'NAME', 'ROLL_NO', 'BATCH_ID', 'PHONE_NO', 'F_CELLNO', 'G_CELLNO')->where(['BATCH_ID' => $batch_id, 'VERIFIED' => 1,
+        ])->orderBy('ROLL_NO', 'ASC')->get();
+
+        if (!empty($students)) {
+            return ['data' => $students];
+        }
+        return NULL;
+    }
+
     public function updateStudentsActualFeeAndNumberOfSemester(Request $request)
     {
         $request->validate(
@@ -1318,6 +1407,8 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
             'NO_OF_SEMESTER' => $request->no_of_semester,
             'PAYMENT_FROM_SEMESTER' => $request->payment_from_semester,
         ]);
+
+
         if (!empty($update)) {
             return response()->json(['success' => 'Update Successful'], 200);
         }
@@ -1852,7 +1943,11 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
             if ($type == 3) { // 3 = ref by student. 2=ref by liaison officer
 
-                $i->admittedByStd = O_STUDENT::with('department', 'batch')->where('reg_code', trim($i->ref_val))->first();
+
+                // unnecessary whitespace removed from reg no
+                $ref_by_std = str_replace(' ', '', $i->ref_val);
+
+                $i->admittedByStd = O_STUDENT::with('department', 'batch')->where('reg_code', trim($ref_by_std))->first();
 
                 try {
                     unset($i->admittedByStd->image);
@@ -1895,7 +1990,8 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         $std->adm_fee = O_CASHIN::where('student_id', $std->id)->first()->amount;
 
         if ($type == 3) { // 3 = ref by student. 2=ref by liaison officer
-            $std->admittedByStd = O_STUDENT::with('department', 'batch')->where('reg_code', trim($std->ref_val))->first();
+            $ref_by_std = str_replace(' ', '', $std->ref_val);
+            $std->admittedByStd = O_STUDENT::with('department', 'batch')->where('reg_code', trim($ref_by_std))->first();
             unset($std->admittedByStd->image);
         }
 

@@ -24,6 +24,24 @@ class AdmissionStudentRegCodeGenerateController extends Controller
     {
 
 
+        $this->validate($request, [
+            'receipt_no' => 'required',
+            'admission_fee' => 'required',
+            'bank_status' => 'required',
+            'bank_id' => 'required',
+            'note' => 'nullable|string|max:100',
+            'student_id' => 'required|integer',
+            'department_id' => 'required|integer',
+            'created_by_email' => 'required|email',
+            'student_type' => 'nullable',
+        ]);
+
+
+        
+
+
+
+
         $batch = O_BATCH::find($request->batch_id);
         $department = O_DEPARTMENTS::find($request->department_id);
 
@@ -49,6 +67,9 @@ class AdmissionStudentRegCodeGenerateController extends Controller
         $newRoll = str_pad($roll ?? 1, 3, '0', STR_PAD_LEFT);
         $admission_year = substr($batch->adm_year, 2);
         $new_reg_code = "{$request->university_code}{$admission_year}{$batch->adm_season}{$request->hall_code}{$request->program_code}{$newRoll}";
+
+        $new_reg_code = $request->student_type == 'CT' ? "{$new_reg_code}-CT" : $new_reg_code;
+
 
         try {
 

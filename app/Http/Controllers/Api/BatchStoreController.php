@@ -62,15 +62,15 @@ class BatchStoreController extends Controller
         $batch->NO_SEAT  = $request->no_of_seat;
         $batch->SESS  = trim($request->session);
 
-        $batch->VALID_D_IDCARD  = date('Y/m/d', strtotime($request->id_card_expiration_date));
+        $batch->VALID_D_IDCARD  = $request->id_card_expiration_date ? date('Y/m/d', strtotime($request->id_card_expiration_date)) : null;
         $batch->ACTIVE_STATUS  = $request->active;
 
-        $batch->CLASS_STR_DATE  = date('Y/m/d', strtotime($request->class_start_date));
+        $batch->CLASS_STR_DATE  = $request->class_start_date ? date('Y/m/d', strtotime($request->class_start_date)) : null;
         $batch->CREATOR_ID  = $employee->id;
-        $batch->LAST_DATE_OF_ADM  = date('Y/m/d', strtotime($request->last_data_of_admission));
+        $batch->LAST_DATE_OF_ADM  = $request->last_data_of_admission ? date('Y/m/d', strtotime($request->last_data_of_admission)) : null;
         $batch->BATCH_NAME  = $request->batch_name;
         $batch->PAYMENT_SYSTEM_ID  = $request->payment_system;
-        $batch->ADMISSION_START_DATE  = date('Y/m/d', strtotime($request->admission_start_date));
+        $batch->ADMISSION_START_DATE  = $request->admission_start_date ? date('Y/m/d', strtotime($request->admission_start_date)) : null;
         $batch->ADM_YEAR  = $request->year;
         $batch->ADM_SEASON  = $request->admission_season;
         $batch->save();

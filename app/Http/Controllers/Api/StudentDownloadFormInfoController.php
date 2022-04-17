@@ -31,15 +31,28 @@ class StudentDownloadFormInfoController extends Controller
     public function __invoke($studentId, Request $request)
     {
 
-        $student = O_STUDENT::with('department:id,name', 'batch:id,batch_name', 'employee:id,emp_name','shift')
-            ->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO,  ADM_FRM_SL ,  ADM_DATE ,emp_id,SESSION_NAME,EMAIL,PHONE_NO,F_NAME,M_NAME,GENDER")
-            ->where('VERIFIED', 1)
-            ->where(['ID' => $studentId]);
+        // $student = O_STUDENT::with('department:id,name', 'batch:id,batch_name,sess', 'employee:id,emp_name','shift')
+        //     ->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO,  ADM_FRM_SL ,  ADM_DATE ,emp_id,SESSION_NAME,EMAIL,PHONE_NO,F_NAME,M_NAME,GENDER")
+        //     ->where('VERIFIED', 1)
+        //     ->where(['ID' => $studentId]);
+        $student = O_STUDENT::with('department:id,name', 'batch:id,batch_name,sess', 'employee:id,emp_name','shift')->select(['ID' ,  'NAME' ,  'ROLL_NO' ,  'REG_CODE' ,  'DEPARTMENT_ID' ,  'BATCH_ID' ,  'SHIFT_ID' ,  'YEAR' ,  'REG_SL_NO',  'ADM_FRM_SL' ,  'ADM_DATE' ,'emp_id','SESSION_NAME','EMAIL','PHONE_NO','F_NAME','M_NAME','GENDER'])->where('VERIFIED', 1)->find($studentId);
 
         if ($student->count() > 0) {
-            $std = $student->first();
+            $std = $student;
 
+                
             $studentProvisionalResult = $this->studentProvisionalResult($std->id);
+            
+
+            if(gettype($studentProvisionalResult) == 'object')
+            {
+                $data = [
+                    'student' => $student,
+                    'error' => $studentProvisionalResult->content()
+                ];
+
+                return $data;
+            }
 
             $totalSemester = $studentProvisionalResult['transcript_data']['semesters'];
 
@@ -80,7 +93,7 @@ class StudentDownloadFormInfoController extends Controller
 
             $cashin_data = O_CASHIN::get_student_account_info_summary($std->id);
 
-//            return $cashin_data;
+            //            return $cashin_data;
 
             $std->actual_total_fee = $cashin_data['summary']['actual_total_fee'] ?? 'N/A';
             $std->total_paid = $cashin_data['summary']['total_paid'] ?? 'N/A';

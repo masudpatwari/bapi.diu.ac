@@ -257,4 +257,11 @@ class O_CASHIN extends Eloquent
             ];
     }
 
+
+
+    public function student()
+    {
+        return $this->belongsTo(O_STUDENT::class, 'student_id', 'id');
+    }
+
 }

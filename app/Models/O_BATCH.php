@@ -28,7 +28,6 @@ class O_BATCH extends Eloquent
     {
         return $this->hasMany(O_STUDENT::class, 'batch_id', 'id');
     }
-
     public function relDepartment()
     {
         return $this->belongsTo(O_DEPARTMENTS::class, 'department_id', 'id');

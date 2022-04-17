@@ -63,6 +63,22 @@ return [
             ]) : [],
         ],
 
+        'hms' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HMS_HOST', ''),
+            'port' => env('DB_HMS_PORT', ''),
+            'database' => env('DB_HMS_DATABASE', ''),
+            'username' => env('DB_HMS_USERNAME', ''),
+            'password' => env('DB_HMS_PASSWORD', ''),
+            'unix_socket' => env('DB_HMS_SOCKET', ''),
+            'charset' => env('DB_HMS_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_HMS_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => env('DB_HMS_PREFIX', ''),
+            'strict' => env('DB_HMS_STRICT_MODE', true),
+            'engine' => env('DB_HMS_ENGINE', null),
+            'timezone' => env('DB_HMS_TIMEZONE', '+00:00'),
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

@@ -25,7 +25,7 @@ class O_STUDENT extends Eloquent
                             'ADM_FRM_SL','RELIGION_ID','GENDER','DOB','BIRTH_PLACE','FG_MONTHLY_INCOME','PARMANENT_ADD','MAILING_ADD',
                             'F_NAME','F_CELLNO','M_NAME','M_CELLNO','G_NAME','G_CELLNO','E_NAME','E_CELLNO','EMP_ID','NATIONALITY',
                             'MARITAL_STATUS','IMAGE','FILENAME','ADM_DATE','CAMPUS_ID','STD_BIRTH_OR_NID_NO','E_EXAM_NAME1','E_GROUP1',
-                            'E_ROLL_NO_1','E_PASSING_YEAR1','E_LTR_GRD_TMARK1','E_DIV_CLS_CGPA1','E_BOARD_UNIVERSITY1','ACTUAL_FEE',
+                            'E_ROLL_NO_1','i','E_LTR_GRD_TMARK1','E_DIV_CLS_CGPA1','E_BOARD_UNIVERSITY1','ACTUAL_FEE',
                             'NO_OF_SEMESTER'];
     protected $hidden = [
       'PASSWORD'
@@ -126,14 +126,27 @@ class O_STUDENT extends Eloquent
 
     public function getMaxAsCurrentSemester()
     {
-
-        return O_SEMESTERS::where('batch_id', $this->batch_id)->max('SEMESTER');
-
+        return O_SEMESTERS::where('batch_id', $this->batch_id)->max('SEMESTER') ?? O_BATCH::find($this->batch_id)->no_of_semester;
     }
 
     public function employee()
     {
         return $this->belongsTo(O_EMP::class, 'emp_id', 'id');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(O_GROUP::class, 'group_id', 'id');
+    }
+
+    public function religion()
+    {
+        return $this->belongsTo(O_RELIGION::class, 'religion_id', 'id');
+    }
+
+    public function refereed_by_parent()
+    {
+        return $this->belongsTo(O_REFEREED_BY_PARENT::class, 'refereed_by_parent_id', 'id');
     }
 
 }

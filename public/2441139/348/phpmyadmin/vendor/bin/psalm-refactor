@@ -1,1 +1,2 @@
-../vimeo/psalm/psalm-refactor
+#!/usr/bin/env php
+<?php require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'psalm-refactor.php';

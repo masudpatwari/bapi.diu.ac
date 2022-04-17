@@ -38,5 +38,6 @@ class O_PURPOSE_PAY extends Eloquent
     const	RE_ADMISSION_FEE_STATUS_ID = 14;
     const	SESSION_FEE_STATUS_ID = 15;
     const	WAIVER_ID = 25;
+    const	MAIN_CERTIFICATE_FEE_STATUS_ID = 26;
 }
 

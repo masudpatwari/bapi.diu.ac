@@ -10,26 +10,41 @@ use App\Http\Controllers\APIBankController;
 use App\Http\Controllers\Imp_Exam_Schedule;
 use App\Http\Controllers\Imp_Eligible_Courses;
 use App\Http\Controllers\Imp_Invoice_Generator;
+use App\Http\Controllers\Api\BatchShowController;
 use App\Http\Controllers\Api\GroupIndexController;
 use App\Http\Controllers\Api\ShiftIndexController;
 use App\Http\Controllers\Api\BatchStoreController;
+use App\Http\Controllers\Api\BatchIndexController;
+use App\Http\Controllers\Api\BatchUpdateController;
+use App\Http\Controllers\Api\StudentIndexController;
 use App\Http\Controllers\Api\CampussIndexController;
 use App\Http\Controllers\Api\CountryIndexController;
+use App\Http\Controllers\Api\StudentUpdateController;
+use App\Http\Controllers\Api\StudentFilterController;
+use App\Http\Controllers\Api\CmsEmployeeSyncToErpController;
 use App\Http\Controllers\Api\StudentReportController;
+use App\Http\Controllers\Api\StudentTransferController;
 use App\Http\Controllers\Api\BatchWiseStudentsController;
 use App\Http\Controllers\Api\PaymentSystemIndexController;
 use App\Http\Controllers\Api\StudentSessionEditController;
-use App\Http\Controllers\Api\StudentSessionUpdateController;
+use App\Http\Controllers\Api\PendingIdCardIndexController;
+use App\Http\Controllers\Api\PendingIdCardUpdateController;
 use App\Http\Controllers\Api\StudentSessionStoreController;
 use App\Http\Controllers\Api\StudentSessionIndexController;
+use App\Http\Controllers\Api\StudentSessionUpdateController;
 use App\Http\Controllers\Api\RefereedByParentIndexController;
-use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
 use App\Http\Controllers\Api\ActiveBatchStudentStoreController;
+use App\Http\Controllers\Api\StudentReadmissionStoreController;
 use App\Http\Controllers\Api\StudentDownloadFormInfoController;
+use App\Http\Controllers\Api\ActiveBatchForAdmissionController;
+use App\Http\Controllers\Api\RegistrationSummeryIndexController;
 use App\Http\Controllers\Api\RefereedChildByParentIndexController;
 use App\Http\Controllers\Api\BatchWiseUnVerifiedStudentsController;
 use App\Http\Controllers\Api\AdmissionStudentRegCodeGenerateController;
-
+use App\Http\Controllers\Api\DepartmentWiseInactiveBatchIndexController;
+use App\Http\Controllers\Api\BatchWiseStudentIdCardStatusUpdateController;
+use App\Http\Controllers\Api\DepartmentWiseBatchStudentIdCardStatusController;
+use App\Models\O_STUDENT;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,10 +61,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+Route::get('get-students', function(){
+    return O_STUDENT::get(['id']);
+});
+
+
+
 Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::get('get-semester-teacher-list/{student_id}/{semester}', [ApiController2::class, 'getSemesterTeacherListByStudentID'])->name('getSemesterTeacherListByStudentID');
-    Route::get('get-semester-list/{student_id}', [ApiController2::class, 'getSemesterListByStudentId'])->name('getSemesterTeacherListByStudentID');
+    Route::get('get-semester-list/{student_id}', [ApiController2::class, 'getSemesterListByStudentId'])->name('getSemesterListByStudentID');
     Route::get('provisional-transcript-marksheet-info/{student_id}', [ApiController::class, 'provisional_transcript_marksheet'])->name('provisional_transcript_marksheet');
     Route::get('latest-foreign-students', [ApiController::class, 'getLatestForeignStudents'])->name('getLatestForeignStudents');
     Route::get('semester-course-list/{student_id}/{semester_number?}', [ApiController::class, 'getSemesterCourseList'])->name('getSemesterCourseList');
@@ -61,7 +83,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
      */
     Route::get('/registration_cards_print/{batch_id}/{m_batch_id}/{token}/{token2}/{site_token}', [ApiController::class, 'registration_cards_print'])->name('registration_cards_print');
     Route::get('/show_batch_list_for_reg_card_printing/{site_token}', [ApiController::class, 'show_batch_list_for_reg_card_printing'])->name('show_batch_list_for_reg_card_printing');
-    Route::get('/show_batch_list_for_reg_card_printed/{site_token}', [ApiController::class, 'show_batch_list_for_reg_card_printed'])->name('show_batch_list_for_reg_card_printing');
+    Route::get('/show_batch_list_for_reg_card_printed/{site_token}', [ApiController::class, 'show_batch_list_for_reg_card_printed'])->name('show_batch_list_for_reg_card_printed');
     Route::get('/reg_card_print_done/{batch_id}/{m_batch_id}/{_token}/{site_token}/{token2}', [ApiController::class, 'reg_card_print_done'])->name('reg_card_print_done');
 
 
@@ -71,6 +93,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::get('/get_student_by_id/{id}', [ApiController::class, 'get_student_by_id'])->name('get_student_by_id');
     Route::get('/get_students_by_batch_id/{id}', [ApiController::class, 'get_student_by_batchid'])->name('get_student_by_batchid');
+    Route::get('/get_students_by_batch/{id}', [ApiController::class, 'get_students_by_batch'])->name('get_students_by_batch');
     Route::get('/get_student_by_reg_code/{reg_code}', [ApiController::class, 'get_student_by_reg_code'])->name('get_student_by_reg_code');
 
 
@@ -107,18 +130,25 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::get('/get_deptartment/{id}', [ApiController::class, 'get_deptartment_info_by_id'])->name('get_deptartment');
     Route::get('/get_batch/{id}', [ApiController::class, 'get_batch_info_by_id'])->name('get_batch');
+    Route::get('/get_active_batch/', [ApiController::class, 'get_active_batch'])->name('get_active_batch');
+    Route::get('/get_students/', [ApiController::class, 'get_students'])->name('get_students');
+    Route::post('/get_active_courses', [ApiController::class, 'get_active_courses'])->name('get_active_courses');
+    Route::get('/get_program_officer_nos', [ApiController::class, 'get_program_officer_nos'])->name('get_program_officer_nos');
+    Route::get('/get_program_officer_by_semester_batch/{batch}/{semester}', [ApiController::class, 'get_program_officer_by_semester_batch'])->name
+    ('get_program_officer_by_semester_batch');
     Route::get('/admission_team/', [ApiController::class, 'get_admission_team'])->name('admission_team');
     Route::get('/batch-mate/{std_id}', [ApiController::class, 'get_batch_mate'])->name('batch_mate');
 
     Route::get('get_banks', [ApiController::class, 'get_banks'])->name('get_banks');
 
-    Route::get('get-bank/{id}', [ApiController::class, 'get_bank'])->name('get_banks');
+    Route::get('get-bank/{id}', [ApiController::class, 'get_bank'])->name('get_bank');
 
     Route::GET('cashin-report', [ApiController::class, 'cashInReport'])->name('cashInReport');
 
 
     /* Improvement route */
     Route::get('/eligible_for_incourse/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_incourse'])->name('eligible_for_incourse');
+    Route::get('/eligible_for_incourse_test/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_incourse_test'])->name('eligible_for_incourse_test');
     Route::get('/eligible_for_final/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_final'])->name('eligible_for_final');
 
     Route::POST('/apply_improvement_request', [Imp_Request::class, 'store'])->name('apply_improvement_request');
@@ -155,6 +185,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::POST('/attendance_departments', [ApiController::class, 'attendance_departments'])->name('attendance_departments');
     Route::POST('/attendance_students', [ApiController::class, 'attendance_students'])->name('attendance_students');
+    Route::get('/attendance_batch_students/{id}', [ApiController::class, 'attendance_batch_students'])->name('attendance_batch_students');
 
     Route::group(['prefix' => 'bank', 'middleware' => ['bank']], function () {
 
@@ -166,12 +197,13 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::POST('/get-accounts-info', [ApiController::class, 'students_account_info_summary']);
     Route::GET('/get-batch-wise-account-info/{batchId}', [ApiController::class, 'batchWiseAccountInfo'])->name('batchWiseAccountInfo');
-    Route::GET('/get-batch-wise-account-info-non-covid/{batchId}', [ApiController::class, 'batchWiseAccountInfoNonCovid'])->name('batchWiseAccountInfo');
+    Route::GET('/get-batch-wise-account-info-non-covid/{batchId}', [ApiController::class, 'batchWiseAccountInfoNonCovid'])->name('batchWiseAccountInfoNonCovid');
     Route::GET('/get-purpose-pay', [ApiController::class, 'getPurposePay'])->name('getPurposePay');
     Route::GET('/get-purpose-pay/{id}', [ApiController::class, 'getPurposePayById'])->name('getPurposePayById');
 
-    Route::POST('/general-payment', [ApiController::class, 'save_general_payment'])->name('getPurposePay');
+    Route::POST('/general-payment', [ApiController::class, 'save_general_payment'])->name('generalPay');
 
+    Route::get('batches-in-department/{department}', [ApiController::class, 'batches_in_department']);
 
     Route::prefix('student')->group(function () {
         Route::get('/{studentId}', StudentDownloadFormInfoController::class);
@@ -189,11 +221,25 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::get('refereed-child-by-parent/{parent_id}', RefereedChildByParentIndexController::class);
         Route::post('active-batch-student-store', ActiveBatchStudentStoreController::class);
         Route::post('batch-store', BatchStoreController::class);
+        Route::get('batch', BatchIndexController::class);
+        Route::get('batch/{id}', BatchShowController::class);
+        Route::post('batch-update', BatchUpdateController::class);
         Route::post('unverified-student-reg-code-generate', AdmissionStudentRegCodeGenerateController::class);
         Route::get('student-session', StudentSessionIndexController::class);
         Route::post('student-session', StudentSessionStoreController::class);
         Route::get('student-session/{id}/edit', StudentSessionEditController::class);
         Route::post('student-session-update', StudentSessionUpdateController::class);
+        Route::get('registration-summery', RegistrationSummeryIndexController::class);
+        Route::post('student-readmission', StudentReadmissionStoreController::class);
+        Route::get('department-wise-inactive-batch/{department_id}', DepartmentWiseInactiveBatchIndexController::class);
+        Route::get('department-wise-batch-student-id-card-status/{department_id}', DepartmentWiseBatchStudentIdCardStatusController::class);
+        Route::post('batch-wise-student-id-card-status-update', BatchWiseStudentIdCardStatusUpdateController::class);
+        Route::get('student/{id}', StudentIndexController::class);
+        Route::post('student-update', StudentUpdateController::class);
+        Route::get('student-filter/{slug}', StudentFilterController::class);
+        Route::get('pending-id-card', PendingIdCardIndexController::class);
+        Route::post('pending-id-card-update', PendingIdCardUpdateController::class);
+        Route::post('student-transfer', StudentTransferController::class);
     });
 
     Route::get('shifts', ShiftIndexController::class);
@@ -201,6 +247,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::get('country', CountryIndexController::class);
     Route::get('campuss', CampussIndexController::class);
     Route::get('payment-system', PaymentSystemIndexController::class);
+    Route::post('cms-employee-sync-to-erp', CmsEmployeeSyncToErpController::class);
 
 
     Route::get('receipt-no-check/{receipt_no}', [ApiController::class, 'receiptNoCheck'])->name('receiptNoCheck');
