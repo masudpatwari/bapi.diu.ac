@@ -63,11 +63,14 @@ class StudentDownloadFormInfoController extends Controller
 
             $totalSemesterSingleArray = array_reduce($totalSemester, 'array_merge', array());
 
+            $totalSemesterHavingMarksheetArray = array_filter($totalSemesterSingleArray, function($allSemesters){
+                return is_array($allSemesters['allocated_courses']);
+            });
 
             $studentSemesters = [];
 
             foreach ($completeSemesters as $completeSemester) {
-                $semester_result = $this->semesterResult($totalSemesterSingleArray, $completeSemester['semester']);
+                $semester_result = $this->semesterResult($totalSemesterHavingMarksheetArray, $completeSemester['semester']);
 
                 $studentSemesters[] = [
                     'semester' => $completeSemester['semester'],

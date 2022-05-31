@@ -1,4 +1,1 @@
-#!/usr/bin/env php
-<?php
-require_once __DIR__ . '/src/Psalm/Internal/Cli/Psalm.php';
-\Psalm\Internal\Cli\Psalm::run($argv);
+../vimeo/psalm/psalm
