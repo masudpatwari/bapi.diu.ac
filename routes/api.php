@@ -215,6 +215,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::prefix('admission')->group(function () {
         Route::get('active-batch-for-admission', ActiveBatchForAdmissionController::class);
+        Route::get('batch-for-admission', [App\Http\Controllers\Api\AllBatchForAdmissionController::class, 'index']);
         Route::get('batch-wise-students/{batch_id}', BatchWiseStudentsController::class);
         Route::get('batch-wise-unverified-students/{batch_id}', BatchWiseUnVerifiedStudentsController::class);
         Route::get('refereed-by-parent/index', RefereedByParentIndexController::class);
@@ -229,6 +230,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::post('student-session', StudentSessionStoreController::class);
         Route::get('student-session/{id}/edit', StudentSessionEditController::class);
         Route::post('student-session-update', StudentSessionUpdateController::class);
+        Route::post('student-email-update', \App\Http\Controllers\Api\StudentEmailUpdateController::class);
         Route::get('registration-summery', RegistrationSummeryIndexController::class);
         Route::post('student-readmission', StudentReadmissionStoreController::class);
         Route::get('department-wise-inactive-batch/{department_id}', DepartmentWiseInactiveBatchIndexController::class);
