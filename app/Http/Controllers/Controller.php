@@ -12,10 +12,13 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Collection;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    public $duplicate_values;
 
     public function folder($method_name)
     {
@@ -76,11 +79,61 @@ class Controller extends BaseController
 
         $distinct_ids = O_MARKS::select('SIFR_ID')->distinct()->where(['STD_ID' => $student_id])->pluck('sifr_id');
 
+        $semster_with_ids = O_SEMESTERS::select('ID','SEMESTER')->whereIn('id', $distinct_ids)->pluck('id','semester')->toArray();
 
-        $semster_and_ids = O_SEMESTERS::select('ID','SEMESTER')->whereIn('id', $distinct_ids)->pluck('id','semester')->toArray();
+        // Semester and ID with duplicates
 
-        // remove duplicate SEMESTER and remove keys
-        $distinct_ids =  array_values( array_unique( $semster_and_ids)) ;
+        $semster_and_ids = O_SEMESTERS::whereIn('id', $distinct_ids)
+            ->get(['id','semester']);
+
+        $sifr_semesters = $semster_and_ids->groupBy('semester');
+
+        // Find out duplicate values
+
+
+        $duplicate_ids = $sifr_semesters->filter(function (Collection $groups) {
+            return $groups->count() > 1;
+        })->toArray();
+
+        if($duplicate_ids){
+            $ids = [];
+
+            // Reject null marks if duplicate
+
+            foreach ($duplicate_ids as $key => $value)
+            {
+                $ids[] = collect($value)->pluck('id')->filter(function ($item) use($student_id){
+                    $this->duplicate_values($item);
+                    $grade = O_MARKS::where(['STD_ID' => $student_id, 'SIFR_ID' => $item])->value('grade_point');
+
+                    return $grade > 0;
+                });
+            }
+
+
+            // remove all duplicate sifr ids
+
+            $sifr_without_duplicates = array_diff($distinct_ids->toArray(), $this->duplicate_values);
+
+
+            // add sifr ids having marks
+
+            $sifr_ids = array_merge(collect($ids)->flatten()->toArray(), $sifr_without_duplicates);
+
+            $distinct_ids = array_values($sifr_ids);
+        }else{
+
+            // remove duplicate SEMESTER and remove keys
+            $semster_and_ids = O_SEMESTERS::select('ID','SEMESTER')->whereIn('id', $distinct_ids)->pluck('id','semester')->toArray();
+
+            $distinct_ids =  array_values( array_unique( $semster_and_ids)) ;
+        }
+
+
+        // code modification ends
+//        dd($semster_with_ids,$distinct_ids);
+//        $semster_and_ids = O_SEMESTERS::select('ID','SEMESTER')->whereIn('id', $distinct_ids)->pluck('id','semester')->toArray();
+
 
         if (!empty($distinct_ids)) {
 
@@ -271,5 +324,13 @@ class Controller extends BaseController
             return $data;
 
         }
+    }
+
+
+
+
+    public function duplicate_values($item)
+    {
+        $this->duplicate_values[] = $item;
     }
 }

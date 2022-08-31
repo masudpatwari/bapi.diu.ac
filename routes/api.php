@@ -66,6 +66,12 @@ Route::get('get-students', function(){
     return O_STUDENT::get(['id']);
 });
 
+Route::get('cache-clear', function(){
+    \Artisan::call('cache:clear');
+   return response()->json(['message' => 'Cache cleared successfully'], 200);
+});
+
+
 
 
 Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
