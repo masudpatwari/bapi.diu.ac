@@ -706,7 +706,7 @@ class ApiController extends Controller
 
     public function batchWiseAccountInfo($batchId)
     {
-        $stds = O_STUDENT::where('batch_id', $batchId)->where('confirmed', 1)->orderBy('roll_no')->get();
+        $stds = O_STUDENT::where('batch_id', $batchId)->orderBy('roll_no')->get();
         $studentInfoArray = [];
 
         foreach ($stds as $std) {
