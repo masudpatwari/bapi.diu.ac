@@ -26,7 +26,7 @@ class O_STUDENT extends Eloquent
                             'F_NAME','F_CELLNO','M_NAME','M_CELLNO','G_NAME','G_CELLNO','E_NAME','E_CELLNO','EMP_ID','NATIONALITY',
                             'MARITAL_STATUS','IMAGE','FILENAME','ADM_DATE','CAMPUS_ID','STD_BIRTH_OR_NID_NO','E_EXAM_NAME1','E_GROUP1',
                             'E_ROLL_NO_1','i','E_LTR_GRD_TMARK1','E_DIV_CLS_CGPA1','E_BOARD_UNIVERSITY1','ACTUAL_FEE',
-                            'NO_OF_SEMESTER'];
+                            'NO_OF_SEMESTER', 'VERIFIED'];
     protected $hidden = [
       'PASSWORD'
     ];
