@@ -2016,4 +2016,20 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
         return response()->json(['status' => false], 200);
     }
+
+    public function sessionAssign()
+    {
+        $students = O_STUDENT::with('batch')->where('session_name', null)->get();
+
+        $info = [];
+
+        foreach($students as $student)
+        {
+            $info[]['session'] = optional($student->batch)->sess;
+            $info[]['name'] = $student->name;
+            $info[]['reg_no'] = $student->reg_code;
+        }
+
+        return $info;
+    }
 }
