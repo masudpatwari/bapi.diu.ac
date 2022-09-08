@@ -2023,11 +2023,13 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
         $info = [];
 
-        foreach($students as $student)
+        foreach($students as $key =>  $student)
         {
             $info[]['session'] = optional($student->batch)->sess;
             $info[]['name'] = $student->name;
             $info[]['reg_no'] = $student->reg_code;
+            $info[]['batch_id'] = $student->batch_id;
+            $info[]['id'] = $student->id;
         }
 
         return $info;

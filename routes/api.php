@@ -72,10 +72,10 @@ Route::get('cache-clear', function(){
 });
 
 
-Route::get('/assign-session', [ApiController::class, 'sessionAssign'])->name('sessionAssign');
 
 
 Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
+    Route::get('/assign-session', [ApiController::class, 'sessionAssign'])->name('sessionAssign');
 
     Route::get('get-semester-teacher-list/{student_id}/{semester}', [ApiController2::class, 'getSemesterTeacherListByStudentID'])->name('getSemesterTeacherListByStudentID');
     Route::get('get-semester-list/{student_id}', [ApiController2::class, 'getSemesterListByStudentId'])->name('getSemesterListByStudentID');
