@@ -2023,9 +2023,8 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
         foreach($students as $student)
         {
-            $student->update([
-                'session_name' => optional($student->batch)->sess
-            ]);
+            $student->session_name = optional($student->batch)->sess;
+            $student->save;
         }
 
         return O_STUDENT::with('batch')->where('session_name', null)->pluck('id') ?? 'done';
