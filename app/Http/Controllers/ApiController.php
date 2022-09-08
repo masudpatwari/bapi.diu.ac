@@ -2024,6 +2024,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         try {
             foreach($students as $student)
             {
+                return $student;
                 $student->session_name = optional($student->batch)->sess;
                 $student->save;
             }
@@ -2032,7 +2033,5 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         {
             return [$exception->getMessage()];
         }
-
-        return 'done';
     }
 }
