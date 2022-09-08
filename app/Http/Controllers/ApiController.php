@@ -2021,10 +2021,16 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
     {
         $students = O_STUDENT::with('batch')->where('session_name', null)->get();
 
-        foreach($students as $student)
+        try {
+            foreach($students as $student)
+            {
+                $student->session_name = optional($student->batch)->sess;
+                $student->save;
+            }
+
+        }catch(\Exception $exception)
         {
-            $student->session_name = optional($student->batch)->sess;
-            $student->save;
+            return [$exception->getMessage()];
         }
 
         return 'done';
