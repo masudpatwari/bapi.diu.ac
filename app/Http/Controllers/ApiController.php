@@ -2027,6 +2027,6 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
             $student->save;
         }
 
-        return O_STUDENT::with('batch')->where('session_name', null)->pluck('id') ?? 'done';
+        return 'done';
     }
 }
