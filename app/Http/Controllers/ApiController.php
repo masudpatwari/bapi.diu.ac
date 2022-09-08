@@ -2021,17 +2021,13 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
     {
         $students = O_STUDENT::with('batch')->where('session_name', null)->get();
 
-        $info = [];
-
-        foreach($students as $key =>  $student)
+        foreach($students as $student)
         {
-            $info[]['session'] = optional($student->batch)->sess;
-            $info[]['name'] = $student->name;
-            $info[]['reg_no'] = $student->reg_code;
-            $info[]['batch_id'] = $student->batch_id;
-            $info[]['id'] = $student->id;
+            $student->update([
+                'session_name' => optional($student->batch)->sess
+            ]);
         }
 
-        return $info;
+        return O_STUDENT::with('batch')->where('session_name', null)->pluck('id') ?? 'done';
     }
 }
