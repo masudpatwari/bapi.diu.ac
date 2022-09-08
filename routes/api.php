@@ -72,6 +72,7 @@ Route::get('cache-clear', function(){
 });
 
 
+Route::get('/assign-session', [ApiController::class, 'sessionAssign'])->name('sessionAssign');
 
 
 Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
@@ -94,7 +95,6 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
 
     Route::get('/get_deptartments', [ApiController::class, 'get_deptartments'])->name('get_deptartments');
-    Route::get('/assign-session', [ApiController::class, 'sessionAssign'])->name('sessionAssign');
     Route::get('/get_all_batch', [ApiController::class, 'get_all_batch'])->name('get_all_batch');
     Route::get('/get_single_batch_detail/{batch_id}', [ApiController::class, 'get_single_batch_detail'])->name('get_single_batch_detail');
 
