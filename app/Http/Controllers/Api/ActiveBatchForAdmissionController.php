@@ -25,6 +25,9 @@ class ActiveBatchForAdmissionController extends Controller
             ->orderAscending()
             ->get();
 
+
+
+
         $collection = collect($batch);
         $sorted = $collection->sortBy('active_students_count');
 

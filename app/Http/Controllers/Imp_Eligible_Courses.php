@@ -94,8 +94,7 @@ class Imp_Eligible_Courses extends Controller
             LEFT JOIN '.$this->db_prefix.'.STUDENT ON STUDENT.ID = MARKS.STD_ID
             LEFT JOIN '.$this->db_prefix.'.S_DEPARTMENT ON S_DEPARTMENT.ID = STUDENT.DEPARTMENT_ID
             LEFT JOIN '.$this->db_prefix.'.SEMESTER_INFO_FOR_RESULT ON SEMESTER_INFO_FOR_RESULT.ID = MARKS.SIFR_ID
-            WHERE STD_ID = '.$id.' AND ( MARKS.COURSE_TOTAL <= COURSE.IMPROVABLE_MARK  OR MARKS.COURSE_TOTAL IS NULL ) AND SEMESTER_INFO_FOR_RESULT.RESULT_TABULATION_STATUS > 4
-        ');
+            WHERE STD_ID = '.$id.' AND ( MARKS.COURSE_TOTAL <= COURSE.IMPROVABLE_MARK  OR MARKS.COURSE_TOTAL IS NULL )');
 	}catch(\Exception $e)
 	{
 		return $e->getMessage();
