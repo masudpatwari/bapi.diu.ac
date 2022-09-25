@@ -46,28 +46,28 @@ class Imp_Eligible_Courses extends Controller
         return $this->generate_courses( $eligible_courses, $id, $examSchedule,'incourse');
     }
 
-    public function eligible_for_incourse_test($id, $examSchedule)
-    {
-        /**
-         *      ALGO:
-         *
-         * 1. incourse course list of selected exam
-         * 2. if appllied then show how many times applied
-         * 3. if paid then show paid status
-         * 4. if not paid then withdraw option show.
-         */
-
-        $eligible_courses = DB::connection('oracle')->select('
-            SELECT MARKS.ID, COURSE.ID AS COURSE_ID, COURSE.NAME, COURSE.CODE, COURSE.CREDIT, COURSE.COURSE_TYPE, MARKS.CONTI_TOTAL as incourse_total, MARKS.FINAL_TOTAL as final_total, MARKS.COURSE_TOTAL, MARKS.GRADE_POINT, MARKS.LETTER_GRADE, COURSE.IMPROVABLE_MARK, S_DEPARTMENT.PROGRAM_TYPE FROM '.$this->db_prefix.'.MARKS
-            LEFT JOIN '.$this->db_prefix.'.COURSE ON COURSE.ID = MARKS.COURSE_ID
-            LEFT JOIN '.$this->db_prefix.'.STUDENT ON STUDENT.ID = MARKS.STD_ID
-            LEFT JOIN '.$this->db_prefix.'.S_DEPARTMENT ON S_DEPARTMENT.ID = STUDENT.DEPARTMENT_ID
-            LEFT JOIN '.$this->db_prefix.'.SEMESTER_INFO_FOR_RESULT ON SEMESTER_INFO_FOR_RESULT.ID = MARKS.SIFR_ID
-            WHERE STD_ID = '.$id.'  AND (MARKS.COURSE_TOTAL >= COURSE.IMPROVABLE_MARK  OR MARKS.COURSE_TOTAL IS NULL ) AND SEMESTER_INFO_FOR_RESULT.RESULT_TABULATION_STATUS > 4
-        ');
-
-        return $this->generate_courses( $eligible_courses, $id, $examSchedule,'incourse');
-    }
+//    public function eligible_for_incourse_test($id, $examSchedule)
+//    {
+//        /**
+//         *      ALGO:
+//         *
+//         * 1. incourse course list of selected exam
+//         * 2. if appllied then show how many times applied
+//         * 3. if paid then show paid status
+//         * 4. if not paid then withdraw option show.
+//         */
+//
+//        $eligible_courses = DB::connection('oracle')->select('
+//            SELECT MARKS.ID, COURSE.ID AS COURSE_ID, COURSE.NAME, COURSE.CODE, COURSE.CREDIT, COURSE.COURSE_TYPE, MARKS.CONTI_TOTAL as incourse_total, MARKS.FINAL_TOTAL as final_total, MARKS.COURSE_TOTAL, MARKS.GRADE_POINT, MARKS.LETTER_GRADE, COURSE.IMPROVABLE_MARK, S_DEPARTMENT.PROGRAM_TYPE FROM '.$this->db_prefix.'.MARKS
+//            LEFT JOIN '.$this->db_prefix.'.COURSE ON COURSE.ID = MARKS.COURSE_ID
+//            LEFT JOIN '.$this->db_prefix.'.STUDENT ON STUDENT.ID = MARKS.STD_ID
+//            LEFT JOIN '.$this->db_prefix.'.S_DEPARTMENT ON S_DEPARTMENT.ID = STUDENT.DEPARTMENT_ID
+//            LEFT JOIN '.$this->db_prefix.'.SEMESTER_INFO_FOR_RESULT ON SEMESTER_INFO_FOR_RESULT.ID = MARKS.SIFR_ID
+//            WHERE STD_ID = '.$id.'  AND (MARKS.COURSE_TOTAL >= COURSE.IMPROVABLE_MARK  OR MARKS.COURSE_TOTAL IS NULL ) AND SEMESTER_INFO_FOR_RESULT.RESULT_TABULATION_STATUS > 4
+//        ');
+//
+//        return $this->generate_courses( $eligible_courses, $id, $examSchedule,'incourse');
+//    }
 
     public function eligible_for_final($id, $examSchedule)
     {
@@ -84,25 +84,25 @@ class Imp_Eligible_Courses extends Controller
         return $this->generate_courses( $eligible_courses, $id , $examSchedule,'final');
     }
 
-    public function eligible_for_final_test($id, $examSchedule)
-    {
-
-	try{
-        $eligible_courses = DB::connection('oracle')->select('
-            SELECT MARKS.ID, COURSE.ID AS COURSE_ID, COURSE.NAME, COURSE.CODE, COURSE.CREDIT, COURSE.COURSE_TYPE, MARKS.CONTI_TOTAL as incourse_total, MARKS.FINAL_TOTAL as final_total, MARKS.COURSE_TOTAL, MARKS.GRADE_POINT, MARKS.LETTER_GRADE, COURSE.IMPROVABLE_MARK, S_DEPARTMENT.PROGRAM_TYPE FROM '.$this->db_prefix.'.MARKS
-            LEFT JOIN '.$this->db_prefix.'.COURSE ON COURSE.ID = MARKS.COURSE_ID
-            LEFT JOIN '.$this->db_prefix.'.STUDENT ON STUDENT.ID = MARKS.STD_ID
-            LEFT JOIN '.$this->db_prefix.'.S_DEPARTMENT ON S_DEPARTMENT.ID = STUDENT.DEPARTMENT_ID
-            LEFT JOIN '.$this->db_prefix.'.SEMESTER_INFO_FOR_RESULT ON SEMESTER_INFO_FOR_RESULT.ID = MARKS.SIFR_ID
-            WHERE STD_ID = '.$id.' AND ( MARKS.COURSE_TOTAL <= COURSE.IMPROVABLE_MARK  OR MARKS.COURSE_TOTAL IS NULL ) AND SEMESTER_INFO_FOR_RESULT.RESULT_TABULATION_STATUS = 4
-        ');
-	}catch(\Exception $e)
-	{
-		return $e->getMessage();
-	}
-
-	return $this->generate_courses( $eligible_courses, $id , $examSchedule,'final');
-    }
+//    public function eligible_for_final_test($id, $examSchedule)
+//    {
+//
+//	try{
+//        $eligible_courses = DB::connection('oracle')->select('
+//            SELECT MARKS.ID, COURSE.ID AS COURSE_ID, COURSE.NAME, COURSE.CODE, COURSE.CREDIT, COURSE.COURSE_TYPE, MARKS.CONTI_TOTAL as incourse_total, MARKS.FINAL_TOTAL as final_total, MARKS.COURSE_TOTAL, MARKS.GRADE_POINT, MARKS.LETTER_GRADE, COURSE.IMPROVABLE_MARK, S_DEPARTMENT.PROGRAM_TYPE FROM '.$this->db_prefix.'.MARKS
+//            LEFT JOIN '.$this->db_prefix.'.COURSE ON COURSE.ID = MARKS.COURSE_ID
+//            LEFT JOIN '.$this->db_prefix.'.STUDENT ON STUDENT.ID = MARKS.STD_ID
+//            LEFT JOIN '.$this->db_prefix.'.S_DEPARTMENT ON S_DEPARTMENT.ID = STUDENT.DEPARTMENT_ID
+//            LEFT JOIN '.$this->db_prefix.'.SEMESTER_INFO_FOR_RESULT ON SEMESTER_INFO_FOR_RESULT.ID = MARKS.SIFR_ID
+//            WHERE STD_ID = '.$id.' AND ( MARKS.COURSE_TOTAL <= COURSE.IMPROVABLE_MARK  OR MARKS.COURSE_TOTAL IS NULL ) AND SEMESTER_INFO_FOR_RESULT.RESULT_TABULATION_STATUS = 4
+//        ');
+//	}catch(\Exception $e)
+//	{
+//		return $e->getMessage();
+//	}
+//
+//	return $this->generate_courses( $eligible_courses, $id , $examSchedule,'final');
+//    }
 
 
     public function generate_courses( $eligible_courses, $id , $examSchedule, $type)

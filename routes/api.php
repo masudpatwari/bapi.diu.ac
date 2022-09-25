@@ -155,9 +155,9 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     /* Improvement route */
     Route::get('/eligible_for_incourse/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_incourse'])->name('eligible_for_incourse');
-    Route::get('/eligible_for_incourse_test/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_incourse_test'])->name('eligible_for_incourse_test');
+//    Route::get('/eligible_for_incourse_test/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_incourse_test'])->name('eligible_for_incourse_test');
     Route::get('/eligible_for_final/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_final'])->name('eligible_for_final');
-    Route::get('/eligible_for_final_test/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_final_test'])->name('eligible_for_final_test');
+//    Route::get('/eligible_for_final_test/{id}/{examSchedule}', [Imp_Eligible_Courses::class, 'eligible_for_final_test'])->name('eligible_for_final_test');
 
     Route::POST('/apply_improvement_request', [Imp_Request::class, 'store'])->name('apply_improvement_request');
     Route::POST('/cancel_improvement_request', [Imp_Request::class, 'destroy'])->name('cancel_improvement_request');
