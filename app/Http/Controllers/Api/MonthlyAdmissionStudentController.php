@@ -14,7 +14,7 @@ class MonthlyAdmissionStudentController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request, $start_date, $end_date)
+    public function index($start_date, $end_date)
     {
         $students = O_STUDENT::selectRaw("ID,NAME,DEPARTMENT_ID,ROLL_NO,REG_CODE,PHONE_NO,ADM_FRM_SL,EMP_ID,VERIFIED,ADM_DATE")
             ->with('department')
