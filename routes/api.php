@@ -250,7 +250,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::get('pending-id-card', PendingIdCardIndexController::class);
         Route::post('pending-id-card-update', PendingIdCardUpdateController::class);
         Route::post('student-transfer', StudentTransferController::class);
-        Route::get('monthly-admission-student/{start}/{end}', MonthlyAdmissionStudentController::class);
+//        Route::get('monthly-admission-student/{start}/{end}', MonthlyAdmissionStudentController::class);
     });
 
     Route::get('shifts', ShiftIndexController::class);
