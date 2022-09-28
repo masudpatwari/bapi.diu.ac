@@ -19,8 +19,8 @@ class MonthlyAdmissionStudentController extends Controller
         $students = O_STUDENT::selectRaw("ID,NAME,DEPARTMENT_ID,ROLL_NO,REG_CODE,PHONE_NO,ADM_FRM_SL,EMP_ID,VERIFIED,ADM_DATE")
             ->with('department')
             ->whereBetween('adm_date', [$start_date,$end_date])
-            ->get();
-            ->groupBy('department.name')
+            ->get()
+            ->groupBy('department.name');
 
         return $students;
     }
