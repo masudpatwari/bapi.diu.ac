@@ -39,17 +39,21 @@ class MonthlyAdmissionStudentController extends Controller
 
 
         $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get();
+
         foreach ($data['dept'] as $list) {
-            $data['month'][$list->department_id] = O_STUDENT::
-            where('department_id',[$list->department_id])
+            $info[$list->department->name] = array_values(O_STUDENT::
+            where('department_id',$list->department_id)
                 ->whereBetween('adm_date',[$start_date,$end_date])
                 ->get()
-                ->groupBy(function($d) { return Carbon::parse($d->adm_date)->format('m');})->map(function ($students, $month){
+                ->groupBy(function($d) { return Carbon::parse($d->adm_date)->format('M');})->map(function ($students, $month) use($list){
                     return [
-                        $month => count($students)
+                        $month => count($students),
+                        'Year' => Carbon::parse($list->adm_date)->format('Y'),
                     ];
-                });
+                })->toArray());
         }
-        return response()->json(["data" => $data], 200);
+
+
+        return response()->json(["data" => $info], 200);
     }
 }
