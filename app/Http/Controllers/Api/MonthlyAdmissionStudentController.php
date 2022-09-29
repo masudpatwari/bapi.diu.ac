@@ -17,15 +17,15 @@ class MonthlyAdmissionStudentController extends Controller
     public function index($start_date, $end_date)
     {
         foreach ($data['dept'] as $list) {
-            $data['date'][$list->department_id] =Students::        
-            where('department_id',[$start_date,$end_date])
-            ->whereBetween('adm_date',['2022-05-01','2022-09-01'])
+            $data['date'][$list->department_id] =O_STUDENT::        
+            where('DEPARTMENT_ID',[$start_date,$end_date])
+            ->whereBetween('ADM_DATE',[$start_date,$end_date]])
             ->select(
                 DB::raw("(count(id)) as total"),
-                DB::raw("(DATE_FORMAT(adm_date, '%y-%m-%d')) as month")
+                DB::raw("(DATE_FORMAT(ADM_DATE, '%y-%m-%d')) as month")
                 )
-                ->orderBy('adm_date','ASC')
-                ->groupBy(DB::raw("DATE_FORMAT(adm_date, '%y-%m-%d')"))
+                ->orderBy('ADM_DATE','ASC')
+                ->groupBy(DB::raw("DATE_FORMAT(ADM_DATE, '%y-%m-%d')"))
                 ->get();
           }
       return $data;
