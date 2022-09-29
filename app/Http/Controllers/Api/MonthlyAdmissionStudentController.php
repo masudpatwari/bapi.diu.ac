@@ -42,8 +42,7 @@ class MonthlyAdmissionStudentController extends Controller
         foreach ($data['dept'] as $list) {
             $data['month'][$list->department_id] = O_STUDENT::
             where('department_id',[$list->department_id])
-                ->whereBetween('adm_date',[$start_date,$end_date])
-                ->select(DB::raw("(count(id)) as total"))
+            ->whereBetween('adm_date',[$start_date,$end_date])          
                 ->get()
                 ->groupBy(function($d) { return Carbon::parse($d->adm_date)->format('m');});
         }
