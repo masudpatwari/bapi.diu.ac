@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\O_STUDENT;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class MonthlyAdmissionStudentController extends Controller
@@ -24,32 +25,28 @@ class MonthlyAdmissionStudentController extends Controller
 
         // return $students;
 
-        // $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get(); 
+        // $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get();
         // foreach ($data['dept'] as $list) {
-        //     $data['date'][$list->department_id] = O_STUDENT::        
+        //     $data['date'][$list->department_id] = O_STUDENT::
         //     where('department_id',[$list->department_id])
         //     ->whereBetween('adm_date',[$start_date,$end_date])
         //     ->select(
-        //         DB::raw("(count(id)) as total"),                
-        //         )                
+        //         DB::raw("(count(id)) as total"),
+        //         )
         //         ->get()
         //         ->groupBy('adm_date');
         //   }
 
 
-        $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get(); 
+        $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get();
         foreach ($data['dept'] as $list) {
-            $data['month'][$list->department_id] = O_STUDENT::        
+            $data['month'][$list->department_id] = O_STUDENT::
             where('department_id',[$list->department_id])
-            ->whereBetween('adm_date',[$start_date,$end_date])
-            ->select(
-                DB::raw("(count(id)) as total"),                              
-                ) 
-                
-                       
+                ->whereBetween('adm_date',[$start_date,$end_date])
+                ->select(DB::raw("(count(id)) as total"))
                 ->get()
                 ->groupBy(function($d) { return Carbon::parse($d->adm_date)->format('m');});
-          }
-      return $data;
+        }
+        return $data;
     }
 }
