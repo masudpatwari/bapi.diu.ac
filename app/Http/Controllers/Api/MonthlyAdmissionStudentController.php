@@ -16,16 +16,24 @@ class MonthlyAdmissionStudentController extends Controller
      */
     public function index($start_date, $end_date)
     {
+        // $students = O_STUDENT::selectRaw("ID,NAME,DEPARTMENT_ID,ROLL_NO,REG_CODE,PHONE_NO,ADM_FRM_SL,EMP_ID,VERIFIED,ADM_DATE")
+        //     ->with('department')
+        //     ->whereBetween('adm_date', [$start_date,$end_date])
+        //     ->get()
+        //     ->groupBy('department.name');
+
+        // return $students;
+        $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date]])->select('department_id')->distinct()->get(); 
         foreach ($data['dept'] as $list) {
-            $data['date'][$list->department_id] =O_STUDENT::        
-            where('DEPARTMENT_ID',[$start_date,$end_date])
-            ->whereBetween('ADM_DATE',[$start_date,$end_date]])
+            $data['date'][$list->department_id] = O_STUDENT::        
+            where('department_id',[$list->department_id])
+            ->whereBetween('adm_date',[$start_date,$end_date]])
             ->select(
                 DB::raw("(count(id)) as total"),
-                DB::raw("(DATE_FORMAT(ADM_DATE, '%y-%m-%d')) as month")
+                DB::raw("(DATE_FORMAT(adm_date, '%y-%m-%d')) as month")
                 )
-                ->orderBy('ADM_DATE','ASC')
-                ->groupBy(DB::raw("DATE_FORMAT(ADM_DATE, '%y-%m-%d')"))
+                ->orderBy('adm_date','ASC')
+                ->groupBy(DB::raw("DATE_FORMAT(adm_date, '%y-%m-%d')"))
                 ->get();
           }
       return $data;
