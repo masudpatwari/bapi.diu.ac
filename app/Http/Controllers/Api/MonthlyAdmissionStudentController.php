@@ -23,7 +23,7 @@ class MonthlyAdmissionStudentController extends Controller
         //     ->groupBy('department.name');
 
         // return $students;
-        $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date]])->select('department_id')->distinct()->get(); 
+        $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get(); 
         foreach ($data['dept'] as $list) {
             $data['date'][$list->department_id] = O_STUDENT::        
             where('department_id',[$list->department_id])
