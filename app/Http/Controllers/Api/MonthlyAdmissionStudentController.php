@@ -43,12 +43,12 @@ class MonthlyAdmissionStudentController extends Controller
             where('department_id',[$list->department_id])
             ->whereBetween('adm_date',[$start_date,$end_date])
             ->select(
-                DB::raw("(count(id)) as total"),
-                DB::raw("(DATE_FORMAT(adm_date, 'mm')) as month")                  
-                )            
+                DB::raw("(count(id)) as total"),                              
+                ) 
                 
-                ->groupBy('month')        
-                ->get();
+                       
+                ->get()
+                ->groupBy(function($d) { return Carbon::parse($d->adm_date)->format('m');});
           }
       return $data;
     }
