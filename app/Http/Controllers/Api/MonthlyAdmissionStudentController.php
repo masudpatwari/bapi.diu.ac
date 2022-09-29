@@ -44,7 +44,7 @@ class MonthlyAdmissionStudentController extends Controller
             ->whereBetween('adm_date',[$start_date,$end_date])
             ->select(
                 DB::raw("(count(id)) as total"),
-                DB::raw("(DATE_FORMAT(adm_date, '%m')) as month")                  
+                DB::raw("(DATE_FORMAT(adm_date, 'mm')) as month")                  
                 )                
                 ->orderBy('month','ASC')
                 ->groupBy('month')        
