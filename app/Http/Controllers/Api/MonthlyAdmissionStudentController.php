@@ -27,7 +27,7 @@ class MonthlyAdmissionStudentController extends Controller
         foreach ($data['dept'] as $list) {
             $data['date'][$list->department_id] = O_STUDENT::        
             where('department_id',[$list->department_id])
-            ->whereBetween('adm_date',[$start_date,$end_date]])
+            ->whereBetween('adm_date',[$start_date,$end_date])
             ->select(
                 DB::raw("(count(id)) as total"),
                 DB::raw("(DATE_FORMAT(adm_date, '%y-%m-%d')) as month")
