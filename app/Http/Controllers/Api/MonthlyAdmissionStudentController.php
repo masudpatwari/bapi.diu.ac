@@ -47,8 +47,8 @@ class MonthlyAdmissionStudentController extends Controller
                 ->get()
                 ->groupBy(function($d) { return Carbon::parse($d->adm_date)->format('M');})->map(function ($students, $month) use($list){
                     return [
-                        $month => count($students),
-                        'Year' => Carbon::parse($list->adm_date)->format('Y'),
+                        'total student' => count($students),
+                        'month' => Carbon::parse($list->adm_date)->format('M, Y'),
                     ];
                 })->toArray());
         }
