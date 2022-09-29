@@ -45,8 +45,8 @@ class MonthlyAdmissionStudentController extends Controller
             ->select(
                 DB::raw("(count(id)) as total"),
                 DB::raw("(DATE_FORMAT(adm_date, 'mm')) as month")                  
-                )                
-                ->orderBy('month','ASC')
+                )            
+                
                 ->groupBy('month')        
                 ->get();
           }
