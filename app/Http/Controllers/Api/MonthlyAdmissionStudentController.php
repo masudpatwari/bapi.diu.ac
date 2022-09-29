@@ -16,28 +16,26 @@ class MonthlyAdmissionStudentController extends Controller
      */
     public function index($start_date, $end_date)
     {
-        $students = O_STUDENT::selectRaw("ID,NAME,DEPARTMENT_ID,ADM_DATE")
-            ->with('department')
-            ->whereBetween('adm_date', [$start_date,$end_date])
-            ->get()
-            ->groupBy('department.name');
+        // $students = O_STUDENT::selectRaw("ID,NAME,DEPARTMENT_ID,ADM_DATE")
+        //     ->with('department')
+        //     ->whereBetween('adm_date', [$start_date,$end_date])
+        //     ->get()
+        //     ->groupBy('department.name');
 
-        return $students;
+        // return $students;
 
 
-    //     $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get(); 
-    //     foreach ($data['dept'] as $list) {
-    //         $data['date'][$list->department_id] = O_STUDENT::        
-    //         where('department_id',[$list->department_id])
-    //         ->whereBetween('adm_date',[$start_date,$end_date])
-    //         ->select(
-    //             DB::raw("(count(id)) as total"),
-    //             DB::raw("(DATE_FORMAT(adm_date, '%y-%m-%d')) as month")
-    //             )
-    //             ->orderBy('adm_date','ASC')
-    //             ->groupBy(DB::raw("DATE_FORMAT(adm_date, '%y-%m-%d')"))
-    //             ->get();
-    //       }
-    //   return $data;
+        $data['dept'] = O_STUDENT::with('department')->whereBetween('adm_date',[$start_date,$end_date])->select('department_id')->distinct()->get(); 
+        foreach ($data['dept'] as $list) {
+            $data['date'][$list->department_id] = O_STUDENT::        
+            where('department_id',[$list->department_id])
+            ->whereBetween('adm_date',[$start_date,$end_date])
+            ->select(
+                DB::raw("(count(id)) as total"),                
+                )                
+                ->get()
+                ->groupBy('adm_date');
+          }
+      return $data;
     }
 }
