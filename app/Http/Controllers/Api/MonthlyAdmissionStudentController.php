@@ -46,9 +46,8 @@ class MonthlyAdmissionStudentController extends Controller
                 ->whereBetween('adm_date',[$start_date,$end_date])
                 ->get()
                 ->groupBy(function($d) { return Carbon::parse($d->adm_date)->format('M');})->map(function ($students, $month) use($list){
-                    return [
-                        // 'month' => $month. ', '.Carbon::parse($list->adm_date)->format('Y'),
-                        'total admission' => count($students),
+                    return [                        
+                        $month => count($students),
                     ];
                 })->toArray());
         }
