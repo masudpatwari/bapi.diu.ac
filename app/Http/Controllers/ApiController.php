@@ -520,25 +520,27 @@ class ApiController extends Controller
     }
 
     public function get_student_by_id($std_id)
-    {
-        $student = O_STUDENT::with('department', 'batch', 'relCampus')->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO ,  GROUP_ID ,  BLOOD_GROUP ,  EMAIL ,  PHONE_NO ,  ADM_FRM_SL ,  RELIGION_ID ,  GENDER ,  DOB ,  BIRTH_PLACE ,  FG_MONTHLY_INCOME ,  PARMANENT_ADD ,  MAILING_ADD ,  F_NAME ,  F_CELLNO ,  F_OCCU ,  M_NAME ,  M_CELLNO ,  M_OCCU ,  G_NAME ,  G_CELLNO ,  G_OCCU ,  E_NAME ,  E_CELLNO ,  E_OCCU ,  E_ADDRESS ,  E_RELATION ,  EMP_ID ,  NATIONALITY ,  MARITAL_STATUS ,  ADM_DATE ,  CAMPUS_ID ,  STD_BIRTH_OR_NID_NO ,  FATHER_NID_NO ,  MOTHER_NID_NO")
+    {       
+        
+          $student = O_STUDENT::with('department', 'batch', 'relCampus')->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID ,  SHIFT_ID ,  YEAR ,  REG_SL_NO ,  GROUP_ID ,  BLOOD_GROUP ,  EMAIL ,  PHONE_NO ,  ADM_FRM_SL ,  RELIGION_ID ,  GENDER ,  DOB ,  BIRTH_PLACE ,  FG_MONTHLY_INCOME ,  PARMANENT_ADD ,  MAILING_ADD ,  F_NAME ,  F_CELLNO ,  F_OCCU ,  M_NAME ,  M_CELLNO ,  M_OCCU ,  G_NAME ,  G_CELLNO ,  G_OCCU ,  E_NAME ,  E_CELLNO ,  E_OCCU ,  E_ADDRESS ,  E_RELATION ,  EMP_ID ,  NATIONALITY ,  MARITAL_STATUS ,  ADM_DATE ,  CAMPUS_ID ,  STD_BIRTH_OR_NID_NO ,  FATHER_NID_NO ,  MOTHER_NID_NO")
             ->where('VERIFIED', 1)
             ->where(['id' => $std_id]);
-
+            
 
         if ($student->count() > 0) {
-            $std = $student->first();
+             $std = $student->first();
 
             if (!$std) {
                 return response()->json(['message' => 'Student Not Found'], 400);
             }
             $std->image = null;
-            $batch_id = $std->batch_id;
+              $batch_id = $std->batch_id;
             $semseter = O_SEMESTERS::where('batch_id', $batch_id)
                 ->orderBy('semester', 'desc')
                 ->first();
 
-            $std->current_semester = $semseter ? $semseter->semester : 'NA';
+                $std->current_semester = $semseter ? $semseter->semester : 'NA';
+               
 
             $std->group = '';
             if ($std->batch->group_id) {
@@ -573,7 +575,7 @@ class ApiController extends Controller
         }*/
 
         $students = O_STUDENT::with('group')
-            ->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,GROUP_ID,EMAIL,PHONE_NO,F_NAME,E_NAME,E_CELLNO")
+            ->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,GROUP_ID,EMAIL,PHONE_NO,F_NAME,E_NAME,E_CELLNO,SESSION_NAME")
             ->where('VERIFIED', 1)
             ->where(['batch_id' => $batch_id])
             ->orderBy('roll_no');
@@ -704,8 +706,11 @@ class ApiController extends Controller
 
     }
 
+  
+
     public function batchWiseAccountInfo($batchId)
     {
+    
         $stds = O_STUDENT::where(['verified' => 1, 'batch_id' => $batchId])->orderBy('roll_no')->get();
         $studentInfoArray = [];
 
@@ -2033,5 +2038,28 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         {
             return [$exception->getMessage()];
         }
+    }
+
+
+    public function exam_controller_session_update(Request $request){
+        
+        $students = $request->ids;
+        $session = $request->session;
+
+        try {
+            foreach($students as $student)
+            {
+                O_STUDENT::where('id', $student)->update([
+                    'session_name' => $session 
+                ]);
+            }
+
+        }catch(\Exception $exception)
+        {
+            return [$exception->getMessage()];
+        }
+            
+        
+
     }
 }

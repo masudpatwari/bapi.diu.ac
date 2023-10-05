@@ -205,6 +205,8 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::POST('/get-accounts-info', [ApiController::class, 'students_account_info_summary']);
     Route::GET('/get-batch-wise-account-info/{batchId}', [ApiController::class, 'batchWiseAccountInfo'])->name('batchWiseAccountInfo');
+    
+   
     Route::GET('/get-batch-wise-account-info-non-covid/{batchId}', [ApiController::class, 'batchWiseAccountInfoNonCovid'])->name('batchWiseAccountInfoNonCovid');
     Route::GET('/get-purpose-pay', [ApiController::class, 'getPurposePay'])->name('getPurposePay');
     Route::GET('/get-purpose-pay/{id}', [ApiController::class, 'getPurposePayById'])->name('getPurposePayById');
@@ -262,6 +264,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
 
     Route::get('receipt-no-check/{receipt_no}', [ApiController::class, 'receiptNoCheck'])->name('receiptNoCheck');
+    Route::post('exam-controller-session-update', [ApiController::class, 'exam_controller_session_update'])->name('session.update');
 
 
     Route::get('/test', function (Request $request) {

@@ -77,13 +77,13 @@ class Controller extends BaseController
     public function make_transcript( $student_id )
     {
 
-        $distinct_ids = O_MARKS::select('SIFR_ID')->distinct()->where(['STD_ID' => $student_id])->pluck('sifr_id');
+         $distinct_ids = O_MARKS::select('SIFR_ID')->distinct()->where(['STD_ID' => $student_id])->pluck('sifr_id');
 
         $semster_with_ids = O_SEMESTERS::select('ID','SEMESTER')->whereIn('id', $distinct_ids)->pluck('id','semester')->toArray();
 
         // Semester and ID with duplicates
 
-        $semster_and_ids = O_SEMESTERS::whereIn('id', $distinct_ids)
+          $semster_and_ids = O_SEMESTERS::whereIn('id', $distinct_ids)
             ->get(['id','semester']);
 
         $sifr_semesters = $semster_and_ids->groupBy('semester');
@@ -106,7 +106,7 @@ class Controller extends BaseController
                     $this->duplicate_values($item);
                     $grade = O_MARKS::where(['STD_ID' => $student_id, 'SIFR_ID' => $item])->value('grade_point');
 
-                    return $grade > 0;
+                    return $grade >0;
                 });
             }
 
@@ -228,6 +228,7 @@ class Controller extends BaseController
                                 }
 
                                 $allocated_courses[$transcripts_key][$allocated_courses_key]['marks'] = [
+                                    'id' => $allocated_courses_value['marks'][0]['id'],
                                     'conti_total' => $allocated_courses_value['marks'][0]['conti_total'],
                                     'final_total' => $allocated_courses_value['marks'][0]['final_total'],
                                     'course_total' => $allocated_courses_value['marks'][0]['course_total'],

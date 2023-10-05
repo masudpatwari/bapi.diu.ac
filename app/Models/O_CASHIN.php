@@ -88,20 +88,23 @@ class O_CASHIN extends Eloquent
 
 	    $advEngFee=   (int) $cashinCollection->where('purpose_pay_id', 23)->sum('amount'); // adv eng fee
 
-	    $totalPaid =  $admissionFee  + $sumOfTutionsFee + $sumOfWaiverFee + $advEngFee;
+        $internProjectResourceFee =   (int) $cashinCollection->where('purpose_pay_id', 20)->sum('amount'); //Internship Project Resource Fee
+
+	    $totalPaid =  $admissionFee  + $sumOfTutionsFee + $sumOfWaiverFee + $advEngFee + $internProjectResourceFee;
 
         // step: 7
         $parent_batch_id  = (int) $batchObj->parent_batch_id ;
         if ( $parent_batch_id > 0){
-            $semesterCompleted = O_SEMESTERS::where('batch_id', $batchObj->id)
+             $semesterCompleted = O_SEMESTERS::where('batch_id', $batchObj->id)
                 ->orWhere('batch_id', $batchObj->parent_batch_id )
-                ->where('exempted',0)->count();
+                ->where('exempted',0)->where('department_id', $batchObj->department_id)->count();
         }
         else{
-            $semesterCompleted = O_SEMESTERS::where('batch_id', $batchObj->id)->where('exempted',0)->count();
+           $semesterCompleted = O_SEMESTERS::where('batch_id', $batchObj->id)->where('exempted',0)->where('department_id', $batchObj->department_id)->count();
         }
+       
 
-        $noOfEximptedSemester = O_SEMESTERS::where('batch_id', $batchObj->id)->where('exempted',1)->count();
+        $noOfEximptedSemester = O_SEMESTERS::where('batch_id', $batchObj->id)->where('exempted',1)->where('department_id', $batchObj->department_id)->count();
         $semesterNeedToComplete = ( $semesterCompleted) - $noOfEximptedSemester;
 
         // step: 8
@@ -199,9 +202,13 @@ class O_CASHIN extends Eloquent
         // step: 6
         $sumOfTutionsFee=   (int) $cashinCollection->where('purpose_pay_id', O_PURPOSE_PAY::TUITION_FEE_STATUS_ID)->sum('amount');
 
-	$sumOfWaiverFee=   (int) $cashinCollection->where('purpose_pay_id', O_PURPOSE_PAY::WAIVER_ID)->sum('amount');
+	    $sumOfWaiverFee=   (int) $cashinCollection->where('purpose_pay_id', O_PURPOSE_PAY::WAIVER_ID)->sum('amount');
 
-        $totalPaid =  $admissionFee  + $sumOfTutionsFee + $sumOfWaiverFee;
+        $advEngFee =   (int) $cashinCollection->where('purpose_pay_id', 23)->sum('amount'); // adv eng fee
+
+         $internProjectResourceFee =   (int) $cashinCollection->where('purpose_pay_id', 20)->sum('amount'); //Internship Project Resource Fee
+
+        $totalPaid =  $admissionFee  + $sumOfTutionsFee + $sumOfWaiverFee + $advEngFee + $internProjectResourceFee;
 
 
         // step: 7
@@ -254,6 +261,8 @@ class O_CASHIN extends Eloquent
                 'total_current_due' => $currentDues,
                 'Due_upto_april' => $preSemesterDue,
                 'total_due' => ceil($totalDues),
+                'internProjectResourceFee'=>$internProjectResourceFee,
+                'advEngFee'=>$advEngFee,
             ];
     }
 
