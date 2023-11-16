@@ -24,7 +24,7 @@ class StudentFilterController extends Controller
 
         $student = O_STUDENT::query()
             ->with('group','batch','department:id,name')
-            ->selectRaw("ID,REG_CODE,ROLL_NO,NAME,GROUP_ID,BATCH_ID,EMAIL,PHONE_NO,F_NAME,E_NAME,E_CELLNO,DEPARTMENT_ID")
+            ->selectRaw("ID,REG_CODE,ROLL_NO,NAME,GROUP_ID,BATCH_ID,EMAIL,PHONE_NO,F_NAME,E_NAME,E_CELLNO,DEPARTMENT_ID,GENDER")
             ->where('REG_CODE', 'LIKE', "%{$search_keyword}%") 
             ->orWhere('ROLL_NO', 'LIKE', "%{$search_keyword}%") 
             ->orWhere('NAME', 'LIKE', "%{$search_keyword}%") 

@@ -107,7 +107,9 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::get('/get_batch_id_name/{department_id}', [ApiController::class, 'get_batch_id_name'])->name('get_batch_id_name');
     Route::get('/check_student/{department_id}/{batch_id}/{reg_code}/{roll_no}/{phone_no}', [ApiController::class, 'check_student'])->name('check_student');
     Route::get('/student_account_info/{ora_uid}', [ApiController::class, 'student_account_info'])->name('student_account_info');
+    Route::get('/student_account_info_by_reg/{reg}', [ApiController::class, 'student_account_info_by_reg'])->name('student_account_info_by_reg');
     Route::get('/student_account_info_summary/{ora_uid}', [ApiController::class, 'student_account_info_summary'])->name('student_account_info_summary');
+    Route::get('/student_account_info_summary_by_reg/{reg}', [ApiController::class, 'student_account_info_summary_by_reg'])->name('student_account_info_summary_by_reg');
     Route::get('/get_all_teacher/{dept_short_code}', [ApiController::class, 'get_all_teacher'])->name('get_all_teacher');
 
     Route::get('/get_past_foreign_student/{fromPage?}/{noOfRowsPerpage?}', [ApiController::class, 'get_past_foreign_student'])->name('get_past_foreign_student');
@@ -172,6 +174,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::POST('/get_improvement_admit_card', [Imp_Invoice_Generator::class, 'get_improvement_admit_card'])->name('get_improvement_admit_card');
 
     Route::POST('/download_regular_admit_card', [ApiController::class, 'download_regular_admit_card'])->name('download_regular_admit_card');
+    Route::POST('/download_regular_admit_card_by_reg', [ApiController::class, 'download_regular_admit_card_by_reg'])->name('download_regular_admit_card_by_reg');
 
 
     Route::POST('/get_improvement_marksheet_for_student', [Imp_Marksheet::class, 'get_improvement_marksheet_for_student'])->name('get_improvement_marksheet_for_student');
@@ -188,6 +191,8 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::post('/save-student-scholarship-as-liaison-officer', [ApiController::class, 'save_student_scholarship_as_liaison_officer'])->name('save_student_scholarship_as_liaison_officer');
     Route::get('/get-ref-student/{type}', [ApiController::class, 'getRefStudent'])->name('getRefStudent');
     Route::get('/get-ref-single-student/{type}/{stdid}', [ApiController::class, 'getRefSingleStudent'])->name('getRefSingleStudent');
+
+ 
 
     Route::POST('/rms-get-batch-info-by-ids', [ApiController::class, 'rms_get_batch_info_by_ids'])->name('rms_get_batch_info_by_ids');
 
@@ -261,6 +266,8 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::get('campuss', CampussIndexController::class);
     Route::get('payment-system', PaymentSystemIndexController::class);
     Route::post('cms-employee-sync-to-erp', CmsEmployeeSyncToErpController::class);
+
+    Route::get('/get_student_by_like_reg_code/{reg_code}', [ApiController::class, 'get_student_by_like_reg_code'])->name('get_student_by_like_reg_code');
 
 
     Route::get('receipt-no-check/{receipt_no}', [ApiController::class, 'receiptNoCheck'])->name('receiptNoCheck');

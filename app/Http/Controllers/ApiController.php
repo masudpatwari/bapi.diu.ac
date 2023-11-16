@@ -634,6 +634,12 @@ class ApiController extends Controller
         return O_CASHIN::where(['cashin.student_id' => $ora_uid])->with('purposePay')->get()->toArray();
     }
 
+    public function student_account_info_by_reg($reg_no)
+    {
+         $student = O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER, payment_from_semester")->where('reg_code','like','%'. $reg_no.'%' )->first();
+        return O_CASHIN::where(['cashin.student_id' => $student->id])->with('purposePay')->get()->toArray();
+    }
+
 
     public function students_account_info_summary(Request $request)
     {
@@ -664,6 +670,17 @@ class ApiController extends Controller
 
         try {
             return O_CASHIN::get_student_account_info_summary($ora_uid);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage() . $exception->getTraceAsString());
+            return response()->json(['error' => $exception->getMessage()], 400);
+        }
+
+    }
+    public function student_account_info_summary_by_reg($reg_no)
+    {
+
+        try {
+            return O_CASHIN::get_student_account_info_summary_by_reg($reg_no);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage() . $exception->getTraceAsString());
             return response()->json(['error' => $exception->getMessage()], 400);
@@ -1552,6 +1569,59 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         return response()->json($student_array, 200);
     }
 
+    public function download_regular_admit_card_by_reg(Request $request)
+    {
+        $reg_code = $request->reg_code;
+        //$ora_uid = 6555;
+        $studentObj = O_STUDENT::select('id', 'name', 'roll_no', 'reg_code', 'f_name', 'm_name', 'department_id', 'batch_id', 'year')->with('department', 'batch')->where('reg_code','like','%'.$reg_code.'%' )->first();
+
+        if (empty($studentObj)) {
+            return response()->json(['error' => 'Student not found in ERP'], 400);
+        }
+
+        $student_array = [];
+        $allocated_courses = [];
+        $department_id = $studentObj->department_id;
+        $batch_id = $studentObj->batch_id;
+        $semester = "No assigned semester";
+
+        $semester = O_SEMESTERS::with(['allocatedCourses' => function ($query) {
+            $query->with('course')->get();
+        }])->where(['department_id' => $department_id, 'batch_id' => $batch_id])->latest('semester')->first();
+
+        if (!empty($semester) && !empty($semester->allocatedCourses)) {
+            $semester_id = $semester->id;
+            foreach ($semester->allocatedCourses as $key => $allocated_course) {
+                $allocated_courses[] = [
+                    'id' => $allocated_course->course->id,
+                    'name' => $allocated_course->course->name,
+                    'code' => $allocated_course->course->code,
+                ];
+            }
+            $semester = $semester->semester;
+        } else {
+            return response()->json(['error' => 'No semester found in RMS'], 400);
+        }
+
+        $year = substr(date('Y'), -2);
+        $student_array = [
+            'id' => $studentObj->id,
+            'name' => $studentObj->name,
+            'roll' => $studentObj->roll_no,
+            'reg_code' => $studentObj->reg_code,
+            'father_name' => $studentObj->f_name ?? 'No Father Name',
+            'mother_name' => $studentObj->m_name ?? 'No Mother Name',
+            'department' => $studentObj->department->name,
+            'batch' => $studentObj->batch->batch_name,
+            'session' => $studentObj->batch->sess,
+            'semester' => $semester,
+            'allocated_course' => $allocated_courses,
+            'payment_status' => 'PAID',
+            'admit_sl_no' => $year . $semester_id . $studentObj->id
+        ];
+        return response()->json($student_array, 200);
+    }
+
     public function getPurposePay()
     {
         return O_PURPOSE_PAY::get();
@@ -2060,6 +2130,12 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         }
             
         
+
+    }
+
+
+    public function  get_student_by_like_reg_code($reg_code){
+        return O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER, payment_from_semester")->where('reg_code','like','%'. $reg_code.'%' )->first();
 
     }
 }
