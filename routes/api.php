@@ -84,6 +84,8 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::get('semester-course-list/{student_id}/{semester_number?}', [ApiController::class, 'getSemesterCourseList'])->name('getSemesterCourseList');
     Route::get('/provisional_result/{student_id}', [ApiController::class, 'provisional_result'])->name('provisional_result');
 
+    Route::get('/provisional_result_test/{student_id}', [ApiController::class, 'provisional_result_test'])->name('provisional_result_test');
+
     /*
      *  Reg card print api
      *
@@ -204,8 +206,12 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
 //    Route::get('/students', 'APIBankController@getStudents');
         Route::post('students', [APIBankController::class, 'getStudentDetail']);
-
+        Route::post('search_student', [APIBankController::class, 'searchStudent']);
+        Route::post('confirm_payment', [APIBankController::class, 'confirmPayment']);
+        Route::get('transection_info', [APIBankController::class, 'transectionInfo']);
+        
     });
+    
 
 
     Route::POST('/get-accounts-info', [ApiController::class, 'students_account_info_summary']);
@@ -268,14 +274,27 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::post('cms-employee-sync-to-erp', CmsEmployeeSyncToErpController::class);
 
     Route::get('/get_student_by_like_reg_code/{reg_code}', [ApiController::class, 'get_student_by_like_reg_code'])->name('get_student_by_like_reg_code');
+    Route::get('/get_readmission_student_info/{reg_code}', [ApiController::class, 'get_readmission_student_info'])->name('get_readmission_student_info');
+    Route::post('/readmission_store', [ApiController::class, 'readmission_store'])->name('readmission_store');
+    Route::get('/get_readmission_department/{department}', [ApiController::class, 'get_readmission_department'])->name('get_readmission_department');
+    Route::get('/get_readmission_student/{id}', [ApiController::class, 'get_readmission_student'])->name('get_readmission_student');
+    Route::get('/foreign-student/{start}/{end}', [ApiController::class, 'get_foreign_student'])->name('foreign_student');
 
 
     Route::get('receipt-no-check/{receipt_no}', [ApiController::class, 'receiptNoCheck'])->name('receiptNoCheck');
+   
     Route::post('exam-controller-session-update', [ApiController::class, 'exam_controller_session_update'])->name('session.update');
 
+    Route::get('convocation_information/{batch_id}', [ApiController::class, 'convocationInformation'])->name('receiptNoCheck');
+    Route::get('admission_register/{batch_id}', [ApiController::class, 'admissionRegister'])->name('radmission_register');
+    Route::get('convocation_list/{batch_id}', [ApiController::class, 'convocationList'])->name('convocation_list');
 
-    Route::get('/test', function (Request $request) {
-//        return \App\Models\O_COURSE::orderBy('ID', 'asc')->where('department_id',7)->get();
-        return \App\Models\O_DEPARTMENTS::get();
-    });
+
+//     Route::get('/test', function (Request $request) {
+// //        return \App\Models\O_COURSE::orderBy('ID', 'asc')->where('department_id',7)->get();
+//         // return \App\Models\O_IMP_REQUEST::where(['std_id'=> '13859'])->first();;
+//         return \App\Models\O_IMP_REQUEST::take(1)->first();;
+//     });
 });
+Route::get('find-students/{year}/{item}', [ApiController::class, 'getStudent'])->name('get-student');
+Route::get('test_imp', [Imp_Eligible_Courses::class, 'test_Imp']);

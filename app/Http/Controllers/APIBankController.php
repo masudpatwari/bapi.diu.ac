@@ -68,4 +68,78 @@ class APIBankController extends Controller
         }
 
     }
+
+    public function searchStudent(Request $request)
+    {
+    
+        $regcode = $request->input('registration_code');
+        $student = O_STUDENT::query()
+            ->with('department:id,name','batch:id,batch_name')
+            ->selectRaw("ID,REG_CODE,ROLL_NO,NAME,BATCH_ID,EMAIL,PHONE_NO,DEPARTMENT_ID,GENDER")
+            ->where('REG_CODE', $regcode) 
+            ->first();
+
+            if($student){
+               $account_info = O_CASHIN::get_student_account_info_summary($student->id);
+                $data = [
+                    "name" => $student->name,
+                    "department" => $student->department->name ??'NA',
+                    "batch" => $student->batch->batch_name ??'NA',
+                    "roll" => $student->roll_no,
+                    "current_dues" => $account_info['summary']['total_current_due']  ??'NA',
+                    "student_id" => $student->id,
+                ];
+                return response()->json(['status'=> 'success', 'data'=>$data], 200);
+            }else{
+                return response()->json(['error'=> 'Student Not Found'], 404);
+            }
+
+    }
+    public function confirmPayment(Request $request){
+
+        $receipt_no =$request->input('transaction_id');
+        $student_id =$request->input('student_id');
+        $type_of_fee =$request->input('type_of_fee');
+        $confirm_amount =$request->input('confirm_amount');
+        $today = date('Y-m-d');
+
+        if (strtotime($receipt_no) !== 'bot' && O_CASHIN::where('receipt_no', $receipt_no)->get()->count() > 0) {
+            return response()->json(['error' => 'Duplicate Receipt No. Found!'], 400);
+        }
+
+        try {
+            $cachsin = new O_CASHIN();
+            $cachsin->purpose_pay_id = $type_of_fee;
+            $cachsin->amount = $confirm_amount;
+            $cachsin->bank_id = 3;
+            $cachsin->student_id = $student_id;
+            $cachsin->receipt_no = $receipt_no;
+            $cachsin->cashorbank = 1; 
+            $cachsin->receive_by = 1;
+            $cachsin->date_bank = '' . $today . '';
+            $cachsin->pay_date = '' . $today . '';
+            $cachsin->receive_by = 486;
+            $cachsin->varified_by = 486;
+            $cachsin->is_varified = 1;
+            $cachsin->save();
+
+            return response()->json(['status'=> 'success', 'message'=>'Payment confirmed successfully]'], 200);
+        } catch (\Exception $ex) {
+            Log::error($ex->getMessage());
+            return response()->json(['error' => 'Something Went Wrong!'], 400);
+        }
+
+    }
+    public function transectionInfo(){
+        
+        try {
+            $data = O_CASHIN::where(['receive_by'=>486])->get();            
+
+            return response()->json(['status'=> 'success', 'data'=>$data], 200);
+        } catch (\Exception $ex) {
+            Log::error($ex->getMessage());
+            return response()->json(['error' => 'Something Went Wrong!'], 400);
+        }
+
+    }
 }

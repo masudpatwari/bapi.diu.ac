@@ -42,11 +42,13 @@ use App\Models\O_VIEW_S_BATCH_REGCARD_PRINTED;
 use App\Models\O_RELIGION;
 use App\Models\O_BANK;
 use App\Models\O_SEMESTERS;
+use App\Models\STUDENT_READMISSION;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ErpAdmissionStoreRequest;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -2138,4 +2140,347 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         return O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER, payment_from_semester")->where('reg_code','like','%'. $reg_code.'%' )->first();
 
     }
+
+    public function  get_readmission_student_info($reg_code){
+        return O_STUDENT::with('department','batch','relCampus','shift')->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER, payment_from_semester,SHIFT_ID,GROUP_ID,CAMPUS_ID")->where('reg_code','like','%'. $reg_code.'%' )->first();
+
+    }
+
+    public function readmission_store(Request $request)
+    {
+        
+    DB::beginTransaction();
+  
+    $student = $request->student; 
+    $data = [
+            "id"=> 12,
+            "o_batch_id"=> $student['batch_id'],
+            "o_shift_id"=> $student['shift_id'],
+            "o_group_id"=> $student['group_id'],
+            "n_batch_id"=> $request->n_batch_id,
+            "n_shift_id"=>  $request->n_shift_id,
+            "n_group_id"=>  $request->n_group_id,
+            "emp_id"=> $request->emp_id,
+            "date_"=> Carbon::now()->format('d-M-y'),
+            "o_campus_id"=>$student['campus_id'],
+            "n_campus_id"=>  $request->n_campus_id,
+            "std_id"=>  $student['id'],
+            "department_id"=> $request->n_department,
+            "old_roll"=> $student['roll_no'],
+            "n_roll"=>$request->n_roll_no
+        ];
+        STUDENT_READMISSION::insert($data);
+
+        O_STUDENT::where('id', $student['id'])->update([
+            'roll_no' => $request->n_roll_no,'batch_id'=>$request->n_batch_id,'shift_id'=>$request->n_shift_id,'campus_id'=>$request->n_campus_id,'group_id'=>$request->n_group_id,
+            'department_id'=>$request->n_department,
+        ]);
+    
+        return response()->json(['status' => true], 200);
+        DB::commit();
+       
+     
+
+    }
+    public function get_readmission_department($short_code)
+    {
+        $department = substr($short_code, 0, 3);
+        return O_DEPARTMENTS::where('short_code','like','%'. $department.'%')->get();
+
+    }
+    public function get_readmission_student($id)
+    {     
+        return STUDENT_READMISSION::where('std_id',$id)->get();       
+
+    }
+
+    public function get_foreign_student($start_date ,$end_date){
+        $students = O_STUDENT::with('department','batch')->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID,  NO_OF_SEMESTER,nationality")->whereRaw("        
+        NATIONALITY <> null OR (
+        LOWER(NATIONALITY) not like  'bang%' and
+        LOWER(NATIONALITY) not like  '%shi' and
+        LOWER(NATIONALITY) not like  'bd')
+        ")
+        ->whereBetween('adm_date', [$start_date, $end_date])
+        ->get();
+
+        $students->transform(function ($student) {
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'reg_code' => $student->reg_code,
+                'roll_no' => $student->roll_no,
+                'department' => $student->department->name,
+                'batch' => $student->batch->batch_name,
+                'nationality' => $student->nationality,
+                
+            ];
+        });
+
+        return $students;
+
+    }
+    public function getStudent($year, $item){
+        
+        // return O_STUDENT::take(1)->get();
+        $students = O_STUDENT::with('department','batch','shift')->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID,  NO_OF_SEMESTER,nationality,phone_no,adm_date,parmanent_add,email,shift_id")->whereRaw("        
+        NATIONALITY <> null OR (
+        LOWER(NATIONALITY)  like  'bang%')
+        ")
+        ->whereYear('adm_date', [$year])
+        // ->whereBetween('adm_date', ['2020-01-01', '2023-12-31'])
+        ->where('parmanent_add', 'LIKE', '%'.$item.'%')
+        // ->where("SUBSTRING(parmanent_add, 5) LIKE '%Dhaka%'")
+        ->get();
+
+        $students->transform(function ($student) {
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'reg_code' => $student->reg_code,
+                'roll_no' => $student->roll_no,
+                'department' => $student->department->name,
+                'batch' => $student->batch->batch_name,
+                'shift' => $student->shift->name,
+                'phone_no' => $student->phone_no,
+                'email' => $student->email,
+                'parmanent_add' => $student->parmanent_add,
+                'adm_date' => $student->adm_date,
+                'nationality' => $student->nationality,
+                
+            ];
+        });
+
+        return $students;
+  
+
+    }
+
+    public function provisional_result_test($student_id)
+    {
+        try {
+            $std = O_STUDENT::find($student_id);
+            // dd($std);
+
+            $currentSemester = $std->getMaxAsCurrentSemester();
+
+            // return $currentSemester;
+
+            if (!empty($std)) {
+                 $transcript = $this->make_transcript_test($student_id);
+
+                // return $transcript;
+                if (!empty($transcript)) {
+                    unset($transcript['student_info']->image);
+                    unset($transcript['student_info']->password);
+                    $semesters = $transcript['transcript_data']['results']['semesters'];
+
+                    $totalCurrentDue = O_CASHIN::get_student_account_info_summary($student_id);
+
+                    $max_due_amount_to_show_result = env("MAX_DUE_AMOUNT_TO_SHOW_RESULT", 5000);
+
+                    if (isset($totalCurrentDue ['summary']['total_current_due']) && $totalCurrentDue ['summary']['total_current_due'] > $max_due_amount_to_show_result) {
+                        if (count($semesters) > 0) {
+                            $semesterOnRemoveAllocated_courses = $currentSemester;
+
+                            foreach ($transcript['transcript_data']['semesters'] as &$rowHas2Semester) {
+
+                                if (isset($rowHas2Semester[0])) {
+                                    if ($rowHas2Semester[0]['semester'] == $semesterOnRemoveAllocated_courses) {
+                                        $rowHas2Semester[0]['allocated_courses'] = 'Please, clear Due to show result';
+                                        $rowHas2Semester[0]['total_semester_gpa'] = 'Please, clear Due to show result';
+                                        $rowHas2Semester[0]['average_grade'] = 'Please, clear Due to show result';
+                                        $rowHas2Semester[0]['semester_result'] = 'Please, clear Due to show result';
+                                    }
+                                }
+
+                                if (isset($rowHas2Semester[1])) {
+                                    if ($rowHas2Semester[1]['semester'] == $semesterOnRemoveAllocated_courses) {
+                                        $rowHas2Semester[1]['allocated_courses'] = 'Please, clear Due to show result';
+                                        $rowHas2Semester[1]['total_semester_gpa'] = 'Please, clear Due to show result';
+                                        $rowHas2Semester[1]['average_grade'] = 'Please, clear Due to show result';
+                                        $rowHas2Semester[1]['semester_result'] = 'Please, clear Due to show result';
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+
+                    return $transcript;
+                } else {
+                    return response()->json(['message' => 'Transcript not complete yet.'], 400);
+                }
+
+            } else {
+                return response()->json(['message' => 'Student Not Found'], 400);
+            }
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], 400);
+        }
+
+    }
+    public function convocationInformation($batch_id){
+        // return O_STUDENT::take(1)->get();
+        
+        $students = O_STUDENT::
+            selectRaw("id,  name,  roll_no, reg_code,group_id,email,phone_no,dob,year,adm_date,e_exam_name1,e_group1,e_passing_year1,e_div_cls_cgpa1,e_exam_name2,e_group2,e_passing_year2,e_div_cls_cgpa2,e_exam_name3,e_group3,e_passing_year3,e_div_cls_cgpa3")
+            ->where('VERIFIED', 1)
+            ->where(['batch_id' => $batch_id])
+            ->orderBy('roll_no');
+
+
+        if ($students->count() > 0) {
+            return response()->json(['data' => $students->get()], 200);
+        }
+        return response()->json(['error' => 'No Student Found!'], 400);
+    }
+
+
+    public function admissionRegister($batch_id){
+
+
+        // return O_CASHIN::take(1)->get();
+        $students = O_STUDENT::selectRaw('
+        id,
+        name,
+        roll_no,
+        reg_code,
+        department_id,
+        batch_id,
+        shift_id,
+        year,
+        reg_sl_no,
+        group_id,
+        blood_group,
+        email,
+        phone_no,
+        adm_frm_sl,
+        religion_id,
+        gender,
+        dob,
+        birth_place,
+        fg_monthly_income,
+        parmanent_add,
+        mailing_add,
+        f_name,
+        f_cellno,
+        f_occu,
+        m_name,
+        m_cellno,
+        m_occu,
+        g_name,
+        g_cellno,
+        g_occu,
+        e_name,
+        e_cellno,
+        e_occu,
+        e_address,
+        e_relation,
+        emp_id,
+        nationality,
+        marital_status,
+        filename,
+        mimetype,
+        verified,
+        id_card_given,
+        id_given_date,
+        id_receiver,
+        adm_date,
+        campus_id,
+        std_birth_or_nid_no,
+        father_nid_no,
+        mother_nid_no,
+        e_exam_name1,
+        e_group1,
+        e_roll_no_1,
+        e_passing_year1,
+        e_ltr_grd_tmark1,
+        e_div_cls_cgpa1,
+        e_board_university1,
+        e_exam_name2,
+        e_group2,
+        e_roll_no_2,
+        e_passing_year2,
+        e_ltr_grd_tmark2,
+        e_div_cls_cgpa2,
+        e_board_university2,
+        e_exam_name3,
+        e_group3,
+        e_roll_no_3,
+        e_passing_year3,
+        e_ltr_grd_tmark3,
+        e_div_cls_cgpa3,
+        e_board_university3,
+        e_exam_name4,
+        e_group4,
+        e_roll_no_4,
+        e_passing_year4,
+        e_ltr_grd_tmark4,
+        e_div_cls_cgpa4,
+        e_board_university4,
+        reg_card_sl,
+        session_name,
+        cgpa
+    ')->with('department:id,name', 'batch:id,batch_name','payment:id,student_id,amount,receipt_no')->where(['batch_id' => $batch_id])->where('VERIFIED', 1)->orderBy('ROLL_NO')->get();
+
+
+    if ($students->count() > 0) {
+        return response()->json(['data' => $students], 200);
+    }
+    return response()->json(['error' => 'No Student Found!'], 400);
+
+    }
+
+
+    public function convocationList($batch_id){
+
+        $students = O_STUDENT::selectRaw(' id, name,roll_no,reg_code,  department_id, batch_id,phone_no')
+       
+        ->whereHas('convocation', function($query) {
+            $query->where('purpose_pay_id', 12)
+                  ->orWhere('purpose_pay_id', 9);
+        })   
+        ->with('department:id,name', 'batch:id,batch_name,sess')
+        ->with([ 'convocation' => function($query) {
+            $query->where('purpose_pay_id', 12)
+                  ->orWhere('purpose_pay_id', 9);
+        }])
+        ->where(['batch_id' => $batch_id])
+        ->where('VERIFIED', 1)
+        ->orderBy('ROLL_NO')
+        ->get();
+
+        $students->transform(function ($student) {
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'roll_no' => $student->roll_no,
+                'phone_no' => $student->phone_no,
+                'department' => $student->department->name,
+                'batch' => $student->batch->batch_name,
+                'session' => $student->batch->sess,
+                'convocations' => $student->convocation->map(function ($convocation) {
+                    return [
+                        'purpose_pay_id' => $convocation->purpose_pay_id,
+                        'amount' => $convocation->amount,
+                        'receipt_no' => $convocation->receipt_no,
+                        'pay_date' => $convocation->pay_date,
+                    ];
+                })
+              
+                
+            ];
+        });
+
+
+        if ($students->count() > 0) {
+            return response()->json(['data' => $students], 200);
+        }
+        return response()->json(['error' => 'No Student Found!'], 400);
+
+        }
+
+    
 }

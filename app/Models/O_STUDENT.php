@@ -149,5 +149,17 @@ class O_STUDENT extends Eloquent
         return $this->belongsTo(O_REFEREED_BY_PARENT::class, 'refereed_by_parent_id', 'id');
     }
 
+    public function payment()
+    {
+        return $this->hasOne(O_CASHIN::class, 'student_id', 'id')->where('purpose_pay_id', 4);
+
+    }
+    public function convocation()
+    {
+        return $this->hasMany(O_CASHIN::class, 'student_id', 'id');
+        // return $this->hasMany(O_CASHIN::class, 'student_id', 'id')->where('purpose_pay_id', 12)->orWhere('purpose_pay_id', 9);
+
+    }
+
 }
 

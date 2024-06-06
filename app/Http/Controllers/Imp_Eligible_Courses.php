@@ -86,9 +86,9 @@ class Imp_Eligible_Courses extends Controller
 
 //    public function eligible_for_final_test($id, $examSchedule)
 //    {
-//
-//	try{
-//        $eligible_courses = DB::connection('oracle')->select('
+
+// 	try{
+//        return $eligible_courses = DB::connection('oracle')->select('
 //            SELECT MARKS.ID, COURSE.ID AS COURSE_ID, COURSE.NAME, COURSE.CODE, COURSE.CREDIT, COURSE.COURSE_TYPE, MARKS.CONTI_TOTAL as incourse_total, MARKS.FINAL_TOTAL as final_total, MARKS.COURSE_TOTAL, MARKS.GRADE_POINT, MARKS.LETTER_GRADE, COURSE.IMPROVABLE_MARK, S_DEPARTMENT.PROGRAM_TYPE FROM '.$this->db_prefix.'.MARKS
 //            LEFT JOIN '.$this->db_prefix.'.COURSE ON COURSE.ID = MARKS.COURSE_ID
 //            LEFT JOIN '.$this->db_prefix.'.STUDENT ON STUDENT.ID = MARKS.STD_ID
@@ -96,12 +96,12 @@ class Imp_Eligible_Courses extends Controller
 //            LEFT JOIN '.$this->db_prefix.'.SEMESTER_INFO_FOR_RESULT ON SEMESTER_INFO_FOR_RESULT.ID = MARKS.SIFR_ID
 //            WHERE STD_ID = '.$id.' AND ( MARKS.COURSE_TOTAL <= COURSE.IMPROVABLE_MARK  OR MARKS.COURSE_TOTAL IS NULL ) AND SEMESTER_INFO_FOR_RESULT.RESULT_TABULATION_STATUS = 4
 //        ');
-//	}catch(\Exception $e)
-//	{
-//		return $e->getMessage();
-//	}
-//
-//	return $this->generate_courses( $eligible_courses, $id , $examSchedule,'final');
+// 	}catch(\Exception $e)
+// 	{
+// 		return $e->getMessage();
+// 	}
+
+// 	return $this->generate_courses( $eligible_courses, $id , $examSchedule,'final');
 //    }
 
 
@@ -199,6 +199,32 @@ class Imp_Eligible_Courses extends Controller
         return $eligible_courses_array;
     }
 
+
+    public function test_Imp()
+    {
+        return  O_IMP_REQUEST::where([
+            // 'id' =>'10455', 
+            'std_id' =>'13859',           
+            // 'type'=> 'final',
+            ])->get();
+
+
+        return  O_IMP_REQUEST_COURSE::where([
+            // 'id' =>'24314', 
+            'std_id' =>'13859',           
+            // 'imp_rq' =>'10454',           
+            // 'type'=> 'final',
+            ])->get();
+
+        // return  O_IMP_REQUEST::where([
+        //     'id' =>'10484',            
+        //     // 'std_id' =>'13859',            
+        //     // 'type'=> 'final',
+        //     ])->update(['std_id'=>'0','invoice_number'=>0]);
+        
+      
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -228,7 +254,7 @@ class Imp_Eligible_Courses extends Controller
      */
     public function show($id)
     {
-        //
+        
     }
 
     /**
@@ -264,4 +290,8 @@ class Imp_Eligible_Courses extends Controller
     {
         //
     }
+
+
+
+ 
 }
