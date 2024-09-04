@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\APIBankController;
+use App\Http\Controllers\ApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +21,16 @@ Route::get('/', function () {
     return response()->json("Hello ! Welcome to Dhaka International University.");
 
 });
+
+
+Route::group(['prefix' => 'exim', 'middleware' => ['bank']], function () {
+
+            Route::post('search_student', [APIBankController::class, 'searchStudent']);
+            Route::post('confirm_payment', [APIBankController::class, 'confirmPayment']);
+            Route::get('transection_info/{date}', [APIBankController::class, 'transectionInfo']);
+            Route::get('transection_delete/{receipt_no}', [APIBankController::class, 'transectionDelete']);
+            Route::GET('get_purpose_pay', [ApiController::class, 'getPurposePay'])->name('PurposePay');
+            
+        });
+   
+

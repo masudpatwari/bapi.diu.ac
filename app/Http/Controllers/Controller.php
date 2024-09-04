@@ -101,11 +101,11 @@ class Controller extends BaseController
             $ids = [];
 
             
-            // $maxIdBySemester = [];
-            // foreach ($duplicate_ids as $semester => $items) {
-            //     $maxIdInSemester = max(array_column($items, 'id'));
-            //     $maxIdBySemester[$semester] = $maxIdInSemester;
-            // }
+            $maxIdBySemester = [];
+            foreach ($duplicate_ids as $semester => $items) {
+                $maxIdInSemester = max(array_column($items, 'id'));
+                $maxIdBySemester[$semester] = $maxIdInSemester;
+            }
             
 
             // Reject null marks if duplicate
@@ -116,8 +116,8 @@ class Controller extends BaseController
                     $this->duplicate_values($item);
                     $grade = O_MARKS::where(['STD_ID' => $student_id, 'SIFR_ID' => $item])->value('grade_point');
 
-                    return $grade != 0  ;
-                    // return $grade != null;
+                    // return $grade <= 0  ;
+                    return $grade != null;
                 });
             }
 
@@ -129,8 +129,8 @@ class Controller extends BaseController
 
             // add sifr ids having marks
 
-            //  $sifr_ids = array_merge(collect($maxIdBySemester)->flatten()->toArray(), $sifr_without_duplicates);
-             $sifr_ids = array_merge(collect($ids)->flatten()->toArray(), $sifr_without_duplicates);
+             $sifr_ids = array_merge(collect($maxIdBySemester)->flatten()->toArray(), $sifr_without_duplicates);
+            //  $sifr_ids = array_merge(collect($ids)->flatten()->toArray(), $sifr_without_duplicates);
 
             $distinct_ids = array_values($sifr_ids);
         }else{

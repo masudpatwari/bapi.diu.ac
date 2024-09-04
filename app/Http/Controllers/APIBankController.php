@@ -37,6 +37,7 @@ use App\Models\O_BANK;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 
 class APIBankController extends Controller
@@ -97,6 +98,17 @@ class APIBankController extends Controller
     }
     public function confirmPayment(Request $request){
 
+        $validator = Validator::make($request->all(), [
+            'type_of_fee' => 'required|integer',
+            'transaction_id' => 'required',
+            'confirm_amount' => 'required|numeric',
+            'student_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response($validator->messages(), 400);
+        }
+
         $receipt_no =$request->input('transaction_id');
         $student_id =$request->input('student_id');
         $type_of_fee =$request->input('type_of_fee');
@@ -130,12 +142,45 @@ class APIBankController extends Controller
         }
 
     }
-    public function transectionInfo(){
+    public function transectionInfo($date){
+        // return $date;
         
         try {
-            $data = O_CASHIN::where(['receive_by'=>486])->get();            
+            $data = O_CASHIN::where(['receive_by'=>486])->where(['pay_date'=>$date])->orderBY('id','desc')->get();
+
+            $data->transform(function ($student) {
+                return [
+                    'id' => $student->id,
+                    'purpose_pay_id' => $student->purpose_pay_id,
+                    'amount' => $student->amount,
+                    'student_id' => $student->student_id,
+                    'receipt_no' => $student->receipt_no,
+                    'pay_date' => $student->pay_date,                  
+                    
+                ];
+            });
+            
+            
 
             return response()->json(['status'=> 'success', 'data'=>$data], 200);
+        } catch (\Exception $ex) {
+            Log::error($ex->getMessage());
+            return response()->json(['error' => 'Something Went Wrong!'], 400);
+        }
+
+    }
+    public function transectionDelete($receipt_no){
+        
+        try {
+            $data = O_CASHIN::where(['receive_by'=>486,'receipt_no'=>$receipt_no])->first();  
+            if(!empty($data)){
+                $data->delete();
+                return response()->json(['message' => 'Transection Delete Successfully!'], 200);
+            }
+            else{
+                return response()->json(['message' => 'Transection Id Not Found!'], 200);
+            }          
+
         } catch (\Exception $ex) {
             Log::error($ex->getMessage());
             return response()->json(['error' => 'Something Went Wrong!'], 400);

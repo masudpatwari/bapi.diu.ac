@@ -191,6 +191,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 
     Route::get('/covid-discount-as-scholarhip', [ApiController::class, 'save_covid_discount'])->name('save_covid_discount');
     Route::post('/save-student-scholarship-as-liaison-officer', [ApiController::class, 'save_student_scholarship_as_liaison_officer'])->name('save_student_scholarship_as_liaison_officer');
+    Route::post('/save-eligible-student-scholarship', [ApiController::class, 'save_eligible_student_scholarship'])->name('save_eligible_student_scholarship');
     Route::get('/get-ref-student/{type}', [ApiController::class, 'getRefStudent'])->name('getRefStudent');
     Route::get('/get-ref-single-student/{type}/{stdid}', [ApiController::class, 'getRefSingleStudent'])->name('getRefSingleStudent');
 
@@ -209,6 +210,7 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
         Route::post('search_student', [APIBankController::class, 'searchStudent']);
         Route::post('confirm_payment', [APIBankController::class, 'confirmPayment']);
         Route::get('transection_info', [APIBankController::class, 'transectionInfo']);
+        Route::get('transection_delete/{receipt_no}', [APIBankController::class, 'transectionDelete']);
         
     });
     
@@ -280,6 +282,10 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
     Route::get('/get_readmission_student/{id}', [ApiController::class, 'get_readmission_student'])->name('get_readmission_student');
     Route::get('/foreign-student/{start}/{end}', [ApiController::class, 'get_foreign_student'])->name('foreign_student');
 
+    Route::get('/get_new_admission_students', [ApiController::class, 'get_new_admission_student'])->name('new_admission_student');
+
+
+
 
     Route::get('receipt-no-check/{receipt_no}', [ApiController::class, 'receiptNoCheck'])->name('receiptNoCheck');
    
@@ -298,3 +304,4 @@ Route::group(['middleware' => ['acceptableIpAddressMiddleware']], function () {
 });
 Route::get('find-students/{year}/{item}', [ApiController::class, 'getStudent'])->name('get-student');
 Route::get('test_imp', [Imp_Eligible_Courses::class, 'test_Imp']);
+Route::get('test_student', [ApiController2::class, 'test_student']);

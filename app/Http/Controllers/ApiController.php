@@ -1883,6 +1883,72 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
     }
 
+    public function save_eligible_student_scholarship(Request $request)
+    {
+
+       
+
+        $validator = Validator::make($request->all(), [
+            'std_id' => 'required|integer',
+            'amount' => 'required|numeric',
+            'receipt_no' => 'required',
+            'office_email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response($validator->messages(), 400);
+        }
+        // return $request->all();
+
+        $std_id = $request->std_id;
+        $amount = $request->amount;
+        $office_email = $request->office_email;
+        $admited_by = $request->admited_by;
+        $note = $request->note;
+
+        // return O_CASHIN::where(['student_id'=>28810,'receipt_no'=>'32476-28810'])->delete();
+        // return O_CASHIN::where(['student_id'=>'32476'])->get();
+
+
+        $bank_payment_date = $today = date('Y/m/d');
+
+        $employee = O_EMP::where('official_email', $office_email)->first();
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found in ERP'], 400);
+        }
+
+        $receive_by = $employee->id;
+
+        $receipt_no = $request->receipt_no;
+
+        if (O_CASHIN::where('receipt_no', $receipt_no)->exists()) {
+            return response()->json(['message' => 'Receipt No. already exists'], 400);
+        }
+
+        try {
+            $cachsin = new O_CASHIN();
+            $cachsin->purpose_pay_id = 2; // 2 = scholarship
+            $cachsin->amount = $amount;
+            $cachsin->bank_id = 0;
+            $cachsin->note = $note;
+            $cachsin->student_id = $std_id;
+            $cachsin->receipt_no = $receipt_no;
+            $cachsin->cashorbank = 0; //  1 = cash, 0 = Bank
+            $cachsin->receive_by = $admited_by;
+            $cachsin->date_bank = '' . $bank_payment_date . ''; // 11/13/2016 = m/d/y format
+            $cachsin->pay_date = '' . $today . '';
+            $cachsin->varified_by = $receive_by;
+            $cachsin->is_varified = 1;
+            $cachsin->save();
+
+            return response()->json($cachsin, 200);
+        } catch (\Exception $ex) {
+            Log::error($ex->getMessage());
+            return response()->json(['error' => 'Something Went Wrong!'], 400);
+        }
+
+    }
+
 
     public function importTransaction(Request $request)
     {
@@ -2007,7 +2073,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
             ->where('refereed_by_parent_id', $type)
             ->where('verified', 1)
             ->where('id_card_given', '!=', 1)
-            ->get();
+            ->get();    
 
         if ($stds->count() == 0) {
             return response()->json(['error' => 'No Student Found'], 400);
@@ -2457,6 +2523,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
                 'id' => $student->id,
                 'name' => $student->name,
                 'roll_no' => $student->roll_no,
+                'reg_code' => $student->reg_code,
                 'phone_no' => $student->phone_no,
                 'department' => $student->department->name,
                 'batch' => $student->batch->batch_name,
@@ -2480,6 +2547,61 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         }
         return response()->json(['error' => 'No Student Found!'], 400);
 
+        }
+
+
+
+        public function get_new_admission_student(){
+
+            $today = date('Y-m-d');
+
+
+            // $today = Carbon::today()->toDateString(); // Get today's date in 'Y-m-d' format
+
+            // $stds = O_STUDENT::
+            //     where('verified', 1)
+            //     // ->whereDate('adm_date', $today)
+            //     ->take(1) // Uncomment this line if you only want to take one record
+            //     ->get();
+        
+            // return $stds;
+           $stds = O_STUDENT::selectRaw("ID,NAME,ROLL_NO,REG_CODE,DEPARTMENT_ID ,  BATCH_ID,adm_date,verified,emp_id, refereed_by_parent_id,refe_by_std_type,ref_val,nationality")
+           ->with('department:id,name', 'batch:id,batch_name')
+                ->where('verified', 1)
+                ->whereDate('adm_date', $today)
+                ->get();
+
+
+
+        if ($stds->count() == 0) {
+            return response()->json(['error' => 'No Student Found'], 400);
+        }
+        $stds->transform(function ($i) {           
+        
+            $ref_by_std = str_replace(' ', '', $i->ref_val);
+        
+            $i->admittedByStd = O_STUDENT::selectRaw("ID,NAME,ROLL_NO,REG_CODE,DEPARTMENT_ID, BATCH_ID")
+            ->with('department:id,name', 'batch:id,batch_name')
+            ->where('reg_code', trim($ref_by_std))
+            ->first();
+        
+            if ($i->admittedByStd) {
+                unset($i->admittedByStd->image);
+            } else {
+                Log::error("Following student does not have a valid ref reg_code");
+                Log::error($i);
+            }
+        
+            return $i;
+        });
+
+       return  $stds;
+      
+
+
+
+
+            
         }
 
     

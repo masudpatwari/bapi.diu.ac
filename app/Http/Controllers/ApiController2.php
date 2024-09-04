@@ -71,4 +71,8 @@ class ApiController2 extends Controller
 //            ->get()->pluck('semester');
 
     }
+
+    public function test_student(){
+        return O_STUDENT::selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  PASSWORD ,  DEPARTMENT_ID ,  BATCH_ID, ACTUAL_FEE , NO_OF_SEMESTER, payment_from_semester,SHIFT_ID,GROUP_ID,CAMPUS_ID")->where('reg_code','CE-E-64-23-126370' )->first();
+    }
 }

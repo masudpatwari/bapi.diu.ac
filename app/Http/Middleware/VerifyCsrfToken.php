@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        'https://bapi.diu.ac/exim/search_student?token=Kyxufto3M1W8ySwrYBFQLAMKBqkbP35uCGBPzKVS2pv1ymiFxGm1xcODuQkC',
+        'https://bapi.diu.ac/exim/confirm_payment?token=Kyxufto3M1W8ySwrYBFQLAMKBqkbP35uCGBPzKVS2pv1ymiFxGm1xcODuQkC'
     ];
 }
