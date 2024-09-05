@@ -77,7 +77,8 @@ class APIBankController extends Controller
         $student = O_STUDENT::query()
             ->with('department:id,name','batch:id,batch_name')
             ->selectRaw("ID,REG_CODE,ROLL_NO,NAME,BATCH_ID,EMAIL,PHONE_NO,DEPARTMENT_ID,GENDER")
-            ->where('REG_CODE', $regcode) 
+            // ->where('REG_CODE', $regcode) 
+            ->where('REG_CODE', 'like', '%' . $regcode . '%')
             ->first();
 
             if($student){

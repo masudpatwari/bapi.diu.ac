@@ -2554,17 +2554,10 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
         public function get_new_admission_student(){
 
             $today = date('Y-m-d');
+            // $today = date('2024-09-04');
 
 
-            // $today = Carbon::today()->toDateString(); // Get today's date in 'Y-m-d' format
-
-            // $stds = O_STUDENT::
-            //     where('verified', 1)
-            //     // ->whereDate('adm_date', $today)
-            //     ->take(1) // Uncomment this line if you only want to take one record
-            //     ->get();
-        
-            // return $stds;
+            
            $stds = O_STUDENT::selectRaw("ID,NAME,ROLL_NO,REG_CODE,DEPARTMENT_ID ,  BATCH_ID,adm_date,verified,emp_id, refereed_by_parent_id,refe_by_std_type,ref_val,nationality")
            ->with('department:id,name', 'batch:id,batch_name')
                 ->where('verified', 1)
