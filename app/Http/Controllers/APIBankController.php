@@ -188,4 +188,33 @@ class APIBankController extends Controller
         }
 
     }
+
+
+    public function singleTransectionInfo($receipt_no){
+
+        try {
+            $data = O_CASHIN::where(['receive_by'=>486,'receipt_no'=>$receipt_no])->first();  
+
+            if(!empty($data)){
+                 $response =  [
+                     'id' => $data->id,
+                     'purpose_pay_id' => $data->purpose_pay_id,
+                     'amount' => $data->amount,
+                     'student_id' => $data->student_id,
+                     'receipt_no' => $data->receipt_no,
+                     'pay_date' => $data->pay_date,                  
+                     
+                 ];
+               return response()->json(['status'=> 'success', 'data'=> $response ], 200);
+             }
+             else{
+                 $response = ['message' =>  'Transection Not Found!'];                    
+                 return response()->json(['status'=> 'fail', 'data'=> $response ], 404);
+             } 
+        } catch (\Exception $ex) {
+            Log::error($ex->getMessage());
+            return response()->json(['error' => 'Something Went Wrong!'], 400);
+        }
+
+    }
 }

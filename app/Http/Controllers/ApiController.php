@@ -1536,7 +1536,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
         $semester = O_SEMESTERS::with(['allocatedCourses' => function ($query) {
             $query->with('course')->get();
-        }])->where(['department_id' => $department_id, 'batch_id' => $batch_id])->latest('semester')->first();
+        }])->where(['department_id' => $department_id, 'batch_id' => $batch_id])->latest('datetime')->first();
 
         if (!empty($semester) && !empty($semester->allocatedCourses)) {
             $semester_id = $semester->id;
@@ -1589,7 +1589,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
         $semester = O_SEMESTERS::with(['allocatedCourses' => function ($query) {
             $query->with('course')->get();
-        }])->where(['department_id' => $department_id, 'batch_id' => $batch_id])->latest('semester')->first();
+        }])->where(['department_id' => $department_id, 'batch_id' => $batch_id])->latest('datetime')->first();
 
         if (!empty($semester) && !empty($semester->allocatedCourses)) {
             $semester_id = $semester->id;
@@ -2261,24 +2261,32 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
     }
 
     public function get_foreign_student($start_date ,$end_date){
-        $students = O_STUDENT::with('department','batch')->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID,  NO_OF_SEMESTER,nationality")->whereRaw("        
+        $students = O_STUDENT::with('department','batch')->selectRaw("ID ,  NAME ,  ROLL_NO ,  REG_CODE ,  DEPARTMENT_ID ,  BATCH_ID,  NO_OF_SEMESTER,nationality,phone_no,email,f_name,m_name,parmanent_add,mailing_add,adm_date")->whereRaw("        
         NATIONALITY <> null OR (
         LOWER(NATIONALITY) not like  'bang%' and
         LOWER(NATIONALITY) not like  '%shi' and
         LOWER(NATIONALITY) not like  'bd')
         ")
+        ->where('verified', 1)
         ->whereBetween('adm_date', [$start_date, $end_date])
         ->get();
 
         $students->transform(function ($student) {
             return [
-                'id' => $student->id,
-                'name' => $student->name,
-                'reg_code' => $student->reg_code,
-                'roll_no' => $student->roll_no,
-                'department' => $student->department->name,
-                'batch' => $student->batch->batch_name,
-                'nationality' => $student->nationality,
+                'Student Id' => $student->id,
+                'Name' => $student->name,
+                'Reg Code' => $student->reg_code,
+                'Roll No' => $student->roll_no,
+                'Department' => $student->department->name,
+                'Batch' => $student->batch->batch_name,
+                'Phone' => $student->phone_no ?? 'NA',
+                'Email' => $student->email ?? 'NA',
+                'Father Name' => $student->f_name ?? 'NA',
+                'Mother Name' => $student->m_name ?? 'NA',
+                'Parmanent Address' => $student->parmanent_add ?? 'NA',
+                'Mailing Address' => $student->mailing_add ?? 'NA',
+                'Admission Date' => $student->adm_date,
+                'Nationality' => $student->nationality,
                 
             ];
         });

@@ -28,6 +28,7 @@ Route::group(['prefix' => 'exim', 'middleware' => ['bank']], function () {
             Route::post('search_student', [APIBankController::class, 'searchStudent']);
             Route::post('confirm_payment', [APIBankController::class, 'confirmPayment']);
             Route::get('transection_info/{date}', [APIBankController::class, 'transectionInfo']);
+            Route::get('single_transection_info/{receipt_no}', [APIBankController::class, 'singleTransectionInfo']);
             Route::get('transection_delete/{receipt_no}', [APIBankController::class, 'transectionDelete']);
             Route::GET('get_purpose_pay', [ApiController::class, 'getPurposePay'])->name('PurposePay');
             
