@@ -2342,6 +2342,7 @@ and nvl(b . LAST_DATE_OF_ADM, sysdate + 1) >= sysdate
 
             if (!empty($std)) {
                  $transcript = $this->make_transcript_test($student_id);
+                //   dd($transcript );
 
                 // return $transcript;
                 if (!empty($transcript)) {
